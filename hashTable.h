@@ -35,7 +35,7 @@ struct HashTable{
             return floor(x*array_size);
         }
         
-        bool insertToTable(int id,T& data)
+        bool insertToTable(const int id,const T& data)
         {
             int index=hashIndex(id);
             try{
