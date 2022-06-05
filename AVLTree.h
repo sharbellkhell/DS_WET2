@@ -347,7 +347,7 @@ void fixUpwardPath(AVLTree<Key,Value>* node, Function function, int grade) {
 
 
 template<class Key,class Value>
-AVLTree<Key,Value>* insertNode(const Key& key, const Value& value, int grade, AVLTree<Key,Value>* root = nullptr ){
+AVLTree<Key,Value>* insertNode(const Key& key, const Value& value, AVLTree<Key,Value>* root = nullptr,int grade = 0 ){
     if(root == nullptr){
         return init(key, value);
     }
@@ -401,7 +401,7 @@ AVLTree<Key,Value>* getSmallestNodeBiggerThan(AVLTree<Key,Value>* node){
 }
 
 template<class Key, class Value>
-AVLTree<Key,Value>* removeNode(AVLTree<Key,Value>* root, const Key& key , int grade ){
+AVLTree<Key,Value>* removeNode(AVLTree<Key,Value>* root, const Key& key , int grade = 0){
     if(key <= 0 || root == nullptr){
         throw InvalidInput();
     }
