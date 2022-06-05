@@ -2,6 +2,7 @@
 #define AVLTREE_H
 #include <assert.h>
 #include "exceptions.h"
+#include "RankInfo.h"
 
 enum SonType {isLeft, isRight, root};
 enum NodeChildren {Leaf, HasLeftSon, HasRightSon, HasTwoSons};
@@ -14,13 +15,15 @@ struct AVLTree {
     AVLTree* parent;
     AVLTree* left;
     AVLTree* right;
+    RankInfo rank;
     int height;
+
     ~AVLTree(){
     }
     AVLTree(const Key &key,
             const Value &value,
             AVLTree* parent = nullptr)  :
-            key(key) , value(value) , parent(parent) , left(nullptr) , right(nullptr), height(0) {}
+            key(key) , value(value) , parent(parent) , left(nullptr) , right(nullptr), height(0), rank() {}
 
 
 };
@@ -153,6 +156,14 @@ AVLTree<Key,Value>* rotateLeft(AVLTree<Key,Value>* A){
     AVLTree<Key,Value>* absolute_parent = A->parent;
     SonType absolute_son_type = whichSonIsNode(A);
     AVLTree<Key,Value>* B = A->right;
+
+    RankInfo  nAL = (A->left) ? A->left->rank : RankInfo()
+    , nBL = (B->left) ? B->left->rank : RankInfo()
+    , nBR = (B->right) ? B->right->rank : RankInfo()
+    , nA  = (A) ? A->rank : RankInfo()
+    , nB  = (B) ? B->rank : RankInfo();
+
+    int AOnlySumGrades = nA.SumGrades - nAL.SumGrades - nB.SumGrades;
     assert(B); // if reached assert, we are performing illegal rotation
     AVLTree<Key,Value>* Bl = B->left;
     B->left = A;
@@ -176,6 +187,11 @@ AVLTree<Key,Value>* rotateLeft(AVLTree<Key,Value>* A){
             break;
         }
     }
+
+    B->rank = RankInfo( 2 + nBR.NumEmployees + nBL.NumEmployees + nAL.NumEmployees,
+                        nA.SumGrades);
+    A->rank = RankInfo(1 + nAL.NumEmployees + nBL.NumEmployees,
+                       AOnlySumGrades + nAL.SumGrades + nBL.SumGrades);
     return B;
 }
 
@@ -184,8 +200,16 @@ template<class Key,class Value>
 AVLTree<Key,Value>* rotateRight(AVLTree<Key,Value>* B){
     AVLTree<Key,Value>* absolute_parent = B->parent;
     SonType absolute_son_type = whichSonIsNode(B);
-
     AVLTree<Key,Value>* A = B->left;
+
+    RankInfo  nAL = (A->left) ? A->left->rank : RankInfo()
+            , nAR = (A->right) ? A->right->rank : RankInfo()
+            , nBR = (B->right) ? B->right->rank : RankInfo()
+            , nA  = (A) ? A->rank : RankInfo()
+            , nB  = (B) ? B->rank : RankInfo();
+
+    int BOnlySumGrades = nB.SumGrades - nA.SumGrades - nBR.SumGrades;
+
     assert(A); // if reached assert, we are performing illegal rotation
     AVLTree<Key,Value>* Ar = A->right;
     //Ar = (A != nullptr ? A->right : nullptr);
@@ -208,6 +232,11 @@ AVLTree<Key,Value>* rotateRight(AVLTree<Key,Value>* B){
         case root: {break;
         }
     }
+    A->rank = RankInfo( 2 + nAL.NumEmployees + nAR.NumEmployees + nBR.NumEmployees,
+                        nB.SumGrades);
+    B->rank = RankInfo( 1 + nBR.NumEmployees + nAR.NumEmployees,
+                        BOnlySumGrades + nBR.SumGrades + nAR.SumGrades);
+
     return A;
 }
 
@@ -255,15 +284,37 @@ void lowest_to_highest(AVLTree<Key,Value*>* root, Key** keys,int* total_keys)
  *                                                Insert Node
   --------------------------------------------------------------------------------------------------------------------*/
 
+// Updates ranks upwards with new value
+template<class Key, class Value>
+void ModifyRanksUpwards(AVLTree<Key,Value>* node, Function function, int grade){
+    if(node->parent == nullptr){
+        return;
+    }
+    switch(function){
+        case Insert:{
+            node->rank.NumEmployees++;
+            node->rank.SumGrades += grade;
+            break;
+        }
+        case Delete:{
+            node->rank.NumEmployees--;
+            node->rank.SumGrades -= grade;
+            break;
+        }
+    }
+    return (ModifyRanksUpwards(node->parent, function,grade));
+}
+
 /*
  * fixUpwardPath
  * Performs the necessary rotations in the upward path from "node" to tree root
  * if the function Insert; only one rotation is needed
  * if the function is Delete; Rotations are needed along all the Upward path
- * returns upmost node after fix
+ *
  */
 template<class Key, class Value>
-void fixUpwardPath(AVLTree<Key,Value>* node, Function function) {
+void fixUpwardPath(AVLTree<Key,Value>* node, Function function, int grade) {
+    AVLTree<Key,Value>* original_node = node;
     while( node != nullptr ) {
         int root_bf = getBF(node);
         if (root_bf == 2) {
@@ -291,21 +342,18 @@ void fixUpwardPath(AVLTree<Key,Value>* node, Function function) {
         }
         node = node->parent;
     }
+    ModifyRanksUpwards(original_node, function,grade);
 }
 
 
 template<class Key,class Value>
-AVLTree<Key,Value>* insertNode(const Key& key, const Value& value, AVLTree<Key,Value>* root = nullptr){
+AVLTree<Key,Value>* insertNode(const Key& key, const Value& value, AVLTree<Key,Value>* root = nullptr,int grade = 0 ){
     if(root == nullptr){
         return init(key, value);
     }
     if(key <= 0){
         throw InvalidInput();
     }
-
-//    if(value == nullptr){ //TODO UNCOMMENT
-//        throw InvalidInput();
-//    }
 
     if(findNode(root, key) != nullptr){
         throw NodeAlreadyExists();
@@ -324,7 +372,7 @@ AVLTree<Key,Value>* insertNode(const Key& key, const Value& value, AVLTree<Key,V
         }
     }
     AVLTree<Key,Value>* n1 = init(key, value, son_type, parent);
-    fixUpwardPath(n1, Insert);
+    fixUpwardPath(n1, Insert, grade);
     return getRoot(n1);
 }
 
@@ -353,7 +401,7 @@ AVLTree<Key,Value>* getSmallestNodeBiggerThan(AVLTree<Key,Value>* node){
 }
 
 template<class Key, class Value>
-AVLTree<Key,Value>* removeNode(AVLTree<Key,Value>* root, const Key& key){
+AVLTree<Key,Value>* removeNode(AVLTree<Key,Value>* root, const Key& key , int grade = 0){
     if(key <= 0 || root == nullptr){
         throw InvalidInput();
     }
@@ -394,7 +442,7 @@ AVLTree<Key,Value>* removeNode(AVLTree<Key,Value>* root, const Key& key){
             } else if (whichSonIsNode(to_remove) == isLeft){
                 new_parent->left = nullptr;
             }
-            fixUpwardPath(to_remove, Delete);
+            fixUpwardPath(to_remove, Delete, grade);
             new_root = getRoot(to_remove);
             if(new_root==to_remove)
                 new_root=nullptr;

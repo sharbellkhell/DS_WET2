@@ -1,0 +1,12 @@
+since we added ranks now to each node in the AVL tree
+each node in the AVL has info about sumGrades
+so when we add a Node to a tree
+we naturally have to go up the search path and add the new employee grade to the sumGrades of all parents,
+but, since AVLTree doesnt know what an employee is, and simply has data about key, value
+we have to manually add an argument to insertNode which has the new (grade) data to add to the Sum of all parents
+
+we could solve this by maybe:
+1. adding an argument to insert node, delete node as mentioned above
+2. keep insertnode without updating the search path, in each file we use insertNode we create and replace it with a function 
+that both calls insertnode and calls a function that updates the search path 
+3.. 
