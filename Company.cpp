@@ -5,7 +5,7 @@
 #include "AVLTree.h"
 #include "Company.h"
 
-Company::Company(int company_id,int value) : companyId(company_id),value(value),add_value(0),purchased(0) {
+Company::Company(int company_id,int value) : companyId(company_id),value(value),parent_value(0) {
     workersId = new HashTable<Employee*>();
     workersSal = nullptr;
 }
