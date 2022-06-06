@@ -10,6 +10,7 @@ class Workplace{
         UF<Company*>* companies;
         HashTable<Employee*>* employees;
         AVLTree<int,AVLTree<int,Employee*>*>* emp_sals;
+        int non_zero_sal;
 
         Workplace(int k);
         ~Workplace() = default;

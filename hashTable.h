@@ -79,14 +79,15 @@ struct HashTable{
             elements=new_elements;
         }
 
-        void remove(int id)
+        bool remove(int id)
         {
             int index=hashIndex(id);
             try{
                 elements[index]=removeNode(elements[index],id);
-            }catch(...){}
+            }catch(...){return false;}
             num_elements--;
             checkIfRehashNeeded();
+            return true;
         }
 
         AVLTree<int,T>* find(int id)
