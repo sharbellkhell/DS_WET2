@@ -2,21 +2,21 @@
 #define DS_WET2_UF_H
 #include "Company.h"
 
-typedef unsigned int key;
+typedef int key;
 typedef Company T;
 
 //template<class T>
 class UF {
 public:
-    unsigned int size;
-    unsigned int current;
+    int size;
+    int current;
     T** Elements ; // Array of the Elements
     key* Parents; // Array of the indices of the Parents of the Elements
-    unsigned int* Sizes; // Array of the Sizes of the Elements
+    int* Sizes; // Array of the Sizes of the Elements
     double* Last_Values; // Holds the company values the last time they were updated
 
 
-    UF(unsigned int size);
+    UF(int size);
     void InitAllElements(T** data_array);
     bool isRoot(key Key);
     key MakeSet(T* data);

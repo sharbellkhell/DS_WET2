@@ -2,11 +2,11 @@
 #include <climits>
 #include <cassert>
 
-UF::UF(unsigned int size):
+UF::UF(int size):
     size(size),
     Elements(new T*[size]),
     Parents(new key[size]),
-    Sizes(new unsigned int[size]),
+    Sizes(new int[size]),
     current(0)
 {
         for(int i = 0; i < size; i++){
@@ -72,16 +72,20 @@ T* UF::Union(key Key1, key Key2){
         Root2 =  Find(Root2);
     }
     assert(Sizes[Root1] != INT_MAX && Sizes[Root2] != INT_MAX);
+    key absolute_root;
 
     if(Sizes[Root1] < Sizes[Root2]) {
+        absolute_root = Root2;
         Parents[Root1] = Root2;
         Sizes[Root2] += Sizes[Root1];
         Sizes[Root1] = INT_MAX;
     } else {
+        absolute_root = Root1;
         Parents[Root2] = Root1;
         Sizes[Root1] += Sizes[Root2];
         Sizes[Root2] = INT_MAX;
     }
+    return Elements[absolute_root];
 }
 
 bool UF::UpdateLastValue(int index, double new_value){
