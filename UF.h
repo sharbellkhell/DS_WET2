@@ -25,7 +25,7 @@ public:
     bool UpdateLastValue(int index, double new_value);
 
 private:
-    int aux_find(key Key);
+    double aux_find(key Key);
 };
 
 

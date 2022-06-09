@@ -76,7 +76,10 @@ StatusType Workplace::removeEmployee(int emp_id)
     if(temp_emp==nullptr)
         return FAILURE;
     if(temp_emp->value->salary>0)
+    {
         this->emp_sals=removeDuplicate(temp_emp->value->salary,emp_id,this->emp_sals);
+        this->non_zero_sal--;
+    }
     this->employees->remove(emp_id);
     delete(temp_emp);
     return SUCCESS;
@@ -115,11 +118,13 @@ StatusType Workplace::employeeSalIncrease(int emp_id,int sal_increase)
     int sal=target->value->salary;
     if(sal-sal_increase!=0){
         this->emp_sals=removeDuplicate(sal,emp_id,this->emp_sals);
+        this->companies->Elements[target->value->EmployerId]->workersSal=removeDuplicate(sal,emp_id,this->companies->Elements[target->value->EmployerId]->workersSal);
         this->non_zero_sal--;
     }
     if(sal!=0)
     {
         this->emp_sals=insertDuplicate(sal,target->value,this->emp_sals);
+        this->companies->Elements[target->value->EmployerId]->workersSal=insertDuplicate(sal,target->value,this->companies->Elements[target->value->EmployerId]->workersSal);
         this->non_zero_sal++;
     }
     return SUCCESS;
@@ -142,30 +147,11 @@ StatusType Workplace::promoteEmp(int emp_id, int bump_grade)
     return SUCCESS;
 }
 
-
-StatusType Workplace::sumGradesBetweenTop(int comp_id, int m, void* sum)
-{
-    if(m<=0 || comp_id <0 || comp_id>this->companies->size)
-        return INVALID_INPUT;
-    if(comp_id == 0)
-    {
-        if(this->non_zero_sal<m)
-            return FAILURE;
-        AVLTree<int,AVLTree<int,Employee*>*>* temp = this->emp_sals;
-        while(temp->rank.NumEmployees>m)
-            temp=temp->right;
-        temp=temp->parent;
-        //didnt understand how rank was emplimented
-    }
-}
-
-StatusType Workplace::compValue(int comp_id, void* standing)
+StatusType Workplace::compValue(int comp_id)
 {
     if(comp_id <= 0 || comp_id>this->companies->size)
         return INVALID_INPUT;
     this->companies->Find(comp_id);
-    double* res=new double(this->companies->Elements[comp_id]->value);
-    standing=(void*)res;
+    std::cout<<"CompanyValue: "<<this->companies->Elements[comp_id]->value<<"\n";
     return SUCCESS;
 }
-

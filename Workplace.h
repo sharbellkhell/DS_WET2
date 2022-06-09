@@ -22,7 +22,7 @@ class Workplace{
         StatusType promoteEmp(int emp_id, int bump_grade);
         StatusType sumGradesBetweenTop(int comp_id, int m, void* sum);
         StatusType averageGradeInRange(int comp_id, int l_sal, int h_sal, void* average);
-        StatusType compValue(int comp_id, void* standing);
+        StatusType compValue(int comp_id);
         StatusType promoteAllInRange(int l_sal, int h_sal, int bump_grade);//bonus
 };
 
