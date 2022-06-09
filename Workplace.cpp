@@ -11,16 +11,39 @@ Workplace Workplace::init(int k)
     return Workplace(k);
 }
 
+static void updatePath(int sal,int m,int g,AVLTree<int,AVLTree<int,Employee*>*>* root)
+{
+    if(root==nullptr)
+        return;
+    root->rank.NumEmployees+=m;
+    root->rank.SumGrades+=g;
+    if(sal>root->key)
+        updatePath(sal,m,g,root->right);
+    if(sal<root->key)
+        updatePath(sal,m,g,root->left);
+
+}
 static AVLTree<int,AVLTree<int,Employee*>*>* insertDuplicate(int sal,Employee* emp,AVLTree<int,AVLTree<int,Employee*>*>* root)
 {
     AVLTree<int,AVLTree<int,Employee*>*>* temp=findNode(root,sal);
     if(temp==nullptr)
     {
         AVLTree<int, Employee*>* sal_Range=init(emp->EmployeeId,emp);
+        sal_Range->rank.NumEmployees=1;
+        sal_Range->rank.SumGrades=emp->grade;
         root=insertNode(sal,sal_Range,root);
     }
     else{
         temp->value=insertNode(emp->EmployeeId,emp,temp->value);
+        temp->rank.NumEmployees++;
+        temp->rank.SumGrades+=emp->grade;
+        temp=temp->parent;
+        while(temp!=nullptr)
+        {
+            temp->rank.NumEmployees++;
+            temp->rank.SumGrades+=emp->grade;
+            temp=temp->parent;
+        }
     }
     return root;
 }
@@ -28,12 +51,18 @@ static AVLTree<int,AVLTree<int,Employee*>*>* insertDuplicate(int sal,Employee* e
 static AVLTree<int,AVLTree<int,Employee*>*>* removeDuplicate(int sal,int emp_id,AVLTree<int,AVLTree<int,Employee*>*>* root)
 {
     AVLTree<int,AVLTree<int,Employee*>*>* temp=findNode(root,sal);
-    temp->value = removeNode(temp->value,emp_id);
+    AVLTree<int,Employee*>* temp_emp=findNode(temp->value,emp_id);
+    if(temp_emp!=nullptr){
+        temp->rank.NumEmployees--;
+        temp->rank.SumGrades-=temp_emp->value->grade;
+    }
+    temp->value = removeNode(temp->value,emp_id);   
     if(temp->value==nullptr){
         root=removeNode(root,sal);
     }
     return root;
 }
+
 StatusType Workplace::addEmployee(int emp_id, int comp_id, int grade)
 {
     if(emp_id<=0 || comp_id<=0 || grade<0 || comp_id>(int)this->companies->size)
@@ -127,10 +156,7 @@ StatusType Workplace::sumGradesBetweenTop(int comp_id, int m, void* sum)
         while(temp->rank.NumEmployees>m)
             temp=temp->right;
         temp=temp->parent;
-        //didnt understand how rank was implemented
+        //didnt understand how rank was emplimented
     }
-
-    //TEMP RETURN
-    return SUCCESS;
 }
 
