@@ -11,18 +11,6 @@ Workplace Workplace::init(int k)
     return Workplace(k);
 }
 
-static void updatePath(int sal,int m,int g,AVLTree<int,AVLTree<int,Employee*>*>* root)
-{
-    if(root==nullptr)
-        return;
-    root->rank.NumEmployees+=m;
-    root->rank.SumGrades+=g;
-    if(sal>root->key)
-        updatePath(sal,m,g,root->right);
-    if(sal<root->key)
-        updatePath(sal,m,g,root->left);
-
-}
 static AVLTree<int,AVLTree<int,Employee*>*>* insertDuplicate(int sal,Employee* emp,AVLTree<int,AVLTree<int,Employee*>*>* root)
 {
     AVLTree<int,AVLTree<int,Employee*>*>* temp=findNode(root,sal);
@@ -51,12 +39,16 @@ static AVLTree<int,AVLTree<int,Employee*>*>* insertDuplicate(int sal,Employee* e
 static AVLTree<int,AVLTree<int,Employee*>*>* removeDuplicate(int sal,int emp_id,AVLTree<int,AVLTree<int,Employee*>*>* root)
 {
     AVLTree<int,AVLTree<int,Employee*>*>* temp=findNode(root,sal);
-    AVLTree<int,Employee*>* temp_emp=findNode(temp->value,emp_id);
-    if(temp_emp!=nullptr){
-        temp->rank.NumEmployees--;
-        temp->rank.SumGrades-=temp_emp->value->grade;
+    AVLTree<int,AVLTree<int,Employee*>*>* rank_fixer=temp;
+    if(temp!=nullptr){
+        AVLTree<int,Employee*>* temp_emp=findNode(temp->value,emp_id);
+        while(temp_emp!=nullptr && rank_fixer!=nullptr){
+            rank_fixer->rank.NumEmployees--;
+            rank_fixer->rank.SumGrades-=temp_emp->value->grade;
+            rank_fixer=rank_fixer->parent;
+        }
     }
-    temp->value = removeNode(temp->value,emp_id);   
+    temp->value = removeNode(temp->value,emp_id); 
     if(temp->value==nullptr){
         root=removeNode(root,sal);
     }
@@ -99,9 +91,9 @@ StatusType Workplace::acquireCompany(int acq_id, int target_id,double factor)
     int k = this->companies->size;
     if(acq_id<=0 || acq_id>k || target_id<=0 || target_id>k || factor <=0 || acq_id==target_id)
         return INVALID_INPUT;
-    unsigned int acq=this->companies->Find(acq_id);
-    unsigned int target=this->companies->Find(target_id);
-    //dont know, where do we store parent company value?
+    int acq=this->companies->Find(acq_id);
+    int target=this->companies->Find(target_id);
+    this->companies->
     return SUCCESS;
 }
 

@@ -4,12 +4,12 @@
 
 UF::UF(int size):
     size(size),
-    Elements(new T*[size]),
-    Parents(new key[size]),
-    Sizes(new int[size]),
+    Elements(new T*[size+1]),
+    Parents(new key[size+1]),
+    Sizes(new int[size+1]),
     current(0)
 {
-        for(int i = 0; i < size; i++){
+        for(int i = 0; i < size+1; i++){
             Sizes[i] = INT_MAX;
         }
 }
@@ -19,17 +19,18 @@ bool UF::isRoot(key Key){
 
 }
 
-key UF::MakeSet(T* data){
-    Elements[current] = data;
+void UF::MakeSet(int i){
+    Elements[current] = new Company(i,i);
     Parents[current] = current; // Root is parent of itself
     Sizes[current] = 1;
     current++;
 }
 
-void UF::InitAllElements(T** data_array){
+void UF::InitAllElements(){
     assert(current == 0);
-    for(int i = 0; i < size; i++ ){
-        MakeSet(data_array[i]);
+
+    for(int i = 1; i < size+1; i++ ){
+        MakeSet(i);
     }
 }
 

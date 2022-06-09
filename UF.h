@@ -17,9 +17,9 @@ public:
 
 
     UF(int size);
-    void InitAllElements(T** data_array);
+    void InitAllElements();
     bool isRoot(key Key);
-    key MakeSet(T* data);
+    void MakeSet(int index);
     key Find(key Key);
     T* Union(key Key1, key Key2);
     bool UpdateLastValue(int index, double new_value);
