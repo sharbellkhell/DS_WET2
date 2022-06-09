@@ -7,6 +7,7 @@ UF::UF(int size):
     Elements(new T*[size+1]),
     Parents(new key[size+1]),
     Sizes(new int[size+1]),
+    Last_Values(new double[size+1]),
     current(0)
 {
         for(int i = 0; i < size+1; i++){
@@ -23,6 +24,7 @@ void UF::MakeSet(int i){
     Elements[current] = new Company(i,i);
     Parents[current] = current; // Root is parent of itself
     Sizes[current] = 1;
+    Last_Values[current]=0;
     current++;
 }
 
@@ -37,30 +39,29 @@ void UF::InitAllElements(){
 //key UF::FindCheckAndUpdate(key Key){
 //
 //}
-
+double UF::aux_find(key Key)
+{
+    if(Parents[Key]==Key)
+        return this->Elements[Key]->value;
+    Elements[Key]->value+=aux_find(Parents[Key])-Last_Values[Key];
+    Last_Values[Key]=Elements[Parents[Key]]->value;
+    return Elements[Key]->value;
+}
 key UF::Find(key Key){
-    key iterator_key = Key;
-    key last_son_key; // Stores the key of the node before the root
-    while(Parents[iterator_key] != iterator_key){
-        last_son_key = iterator_key;
-        iterator_key = Parents[iterator_key];
-
-    }
-    key root = iterator_key; // Save root index
-    bool value_was_updated = false;
-    // Check if there has been a change in value
-    if(Last_Values[last_son_key] != Last_Values[root]){
-        value_was_updated = true;
-    }
-    iterator_key = Key;
-    // Cycle once again to set parent values in find Path to Root
-    while (iterator_key != root) {
-        iterator_key = Parents[iterator_key];
-        Parents[iterator_key] = root; // Optimize next Find operations
-        if(value_was_updated){
-            Last_Values[iterator_key] = Last_Values[root];
+    if(Parents[Key]==Key)
+        return Elements[Key]->value;
+    key root=Key;
+    while(Parents[root]==root)
+        root=Parents[root];
+    double result=aux_find(Key);
+    key iterator=Key;
+    key temp=0;
+    while(Parents[iterator]==iterator)
+        {
+            temp=Parents[iterator];
+            Parents[iterator]=root;
+            iterator=temp;
         }
-    }
     return root;
 }
 

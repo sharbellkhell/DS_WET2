@@ -23,6 +23,9 @@ public:
     key Find(key Key);
     T* Union(key Key1, key Key2);
     bool UpdateLastValue(int index, double new_value);
+
+private:
+    int aux_find(key Key);
 };
 
 

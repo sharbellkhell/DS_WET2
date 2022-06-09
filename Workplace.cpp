@@ -57,7 +57,7 @@ static AVLTree<int,AVLTree<int,Employee*>*>* removeDuplicate(int sal,int emp_id,
 
 StatusType Workplace::addEmployee(int emp_id, int comp_id, int grade)
 {
-    if(emp_id<=0 || comp_id<=0 || grade<0 || comp_id>(int)this->companies->size)
+    if(emp_id<=0 || comp_id<=0 || grade<0 || comp_id>this->companies->size)
         return INVALID_INPUT;
     Employee* temp = new Employee(emp_id,comp_id,0,grade);
     if(this->employees->insertToTable(emp_id,temp)==false)
@@ -93,7 +93,14 @@ StatusType Workplace::acquireCompany(int acq_id, int target_id,double factor)
         return INVALID_INPUT;
     int acq=this->companies->Find(acq_id);
     int target=this->companies->Find(target_id);
-    this->companies->
+    this->companies->Elements[acq]->value+=(factor*this->companies->Elements[target]->value);
+    this->companies->Last_Values[target]=this->companies->Elements[acq]->value;
+    AVLTree<int,AVLTree<int,Employee*>*>* temp = this->companies->Elements[target]->workersSal;
+    while(temp->value!=nullptr)
+    {
+        this->companies->Elements[acq]->workersSal=insertDuplicate(temp->value->value->salary,temp->value->value,this->companies->Elements[acq]->workersSal);
+        temp=removeDuplicate(temp->value->value->salary,temp->value->value->EmployeeId,temp);
+    }
     return SUCCESS;
 }
 
@@ -150,5 +157,15 @@ StatusType Workplace::sumGradesBetweenTop(int comp_id, int m, void* sum)
         temp=temp->parent;
         //didnt understand how rank was emplimented
     }
+}
+
+StatusType Workplace::compValue(int comp_id, void* standing)
+{
+    if(comp_id <= 0 || comp_id>this->companies->size)
+        return INVALID_INPUT;
+    this->companies->Find(comp_id);
+    double* res=new double(this->companies->Elements[comp_id]->value);
+    standing=(void*)res;
+    return SUCCESS;
 }
 
