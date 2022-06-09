@@ -7,14 +7,14 @@
 
 class Workplace{
     public:
-        UF<Company*>* companies;
+        UF* companies;
         HashTable<Employee*>* employees;
         AVLTree<int,AVLTree<int,Employee*>*>* emp_sals;
         int non_zero_sal;
 
-        Workplace(int k);
+        explicit Workplace(int k);
         ~Workplace() = default;
-        Workplace init(int k);
+        static Workplace init(int k);
         StatusType addEmployee(int emp_id, int comp_id, int grade);
         StatusType removeEmployee(int emp_id);
         StatusType acquireCompany(int acq_id, int target_id,double factor);

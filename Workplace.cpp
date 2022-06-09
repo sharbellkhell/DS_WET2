@@ -1,7 +1,7 @@
 #include "Workplace.h"
 
 Workplace::Workplace(int k): non_zero_sal(0){
-    companies = new UF<Company*>(k);
+    companies = new UF(k);
     employees=new HashTable<Employee*>();
     emp_sals = nullptr;
 }
@@ -127,7 +127,10 @@ StatusType Workplace::sumGradesBetweenTop(int comp_id, int m, void* sum)
         while(temp->rank.NumEmployees>m)
             temp=temp->right;
         temp=temp->parent;
-        //didnt understand how rank was emplimented
+        //didnt understand how rank was implemented
     }
+
+    //TEMP RETURN
+    return SUCCESS;
 }
 

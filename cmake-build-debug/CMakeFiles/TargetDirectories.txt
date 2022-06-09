@@ -1,0 +1,3 @@
+C:/Users/thebo/OneDrive - Technion/2022B/234218 - Data Structures 1/HW/DS_WET2/cmake-build-debug/CMakeFiles/DS_WET2.dir
+C:/Users/thebo/OneDrive - Technion/2022B/234218 - Data Structures 1/HW/DS_WET2/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/thebo/OneDrive - Technion/2022B/234218 - Data Structures 1/HW/DS_WET2/cmake-build-debug/CMakeFiles/rebuild_cache.dir
