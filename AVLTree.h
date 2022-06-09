@@ -287,7 +287,7 @@ void lowest_to_highest(AVLTree<Key,Value*>* root, Key** keys,int* total_keys)
 // Updates ranks upwards with new value
 template<class Key, class Value>
 void ModifyRanksUpwards(AVLTree<Key,Value>* node, Function function, int grade){
-    if(node->parent == nullptr){
+    if(node == nullptr){
         return;
     }
     switch(function){
@@ -349,7 +349,10 @@ void fixUpwardPath(AVLTree<Key,Value>* node, Function function, int grade) {
 template<class Key,class Value>
 AVLTree<Key,Value>* insertNode(const Key& key, const Value& value, AVLTree<Key,Value>* root = nullptr,int grade = 0 ){
     if(root == nullptr){
-        return init(key, value);
+        AVLTree<Key,Value>* to_return = init(key, value);
+        to_return->rank.SumGrades = grade;
+        to_return->rank.NumEmployees = 1;
+        return to_return;
     }
     if(key <= 0){
         throw InvalidInput();
