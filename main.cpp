@@ -5,6 +5,9 @@
 #define INSERT(EI) \
 tree = insertNode(EI->EmployeeId,EI,tree,EI->grade);
 
+#define WHOIS(EI) \
+std::cout << "id:" << EI->EmployeeId << " ,grade:" << EI->grade << " ,sal:" << EI->salary << std::endl;
+
 void printTreeInternal(AVLTree<int,Employee*>* root, std::string indent, bool last) {
     if (root != nullptr) {
         std::cout << indent;
@@ -35,6 +38,13 @@ int main(){
     Employee* e3 = new Employee(3,1, 1000, 7);
     Employee* e4 = new Employee(4,1, 1000, 8);
     Employee* e5 = new Employee(5,1, 1000, 25);
+
+
+    WHOIS(e1)
+    WHOIS(e2)
+    WHOIS(e3)
+    WHOIS(e4)
+    WHOIS(e5)
 
     AVLTree<int, Employee*>* tree = insertNode<int,Employee*>(e1->EmployeeId,e1, nullptr, e1->grade);
     PrintTree(tree);
