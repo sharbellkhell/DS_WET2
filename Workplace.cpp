@@ -155,3 +155,139 @@ StatusType Workplace::compValue(int comp_id)
     std::cout<<"CompanyValue: "<<this->companies->Elements[comp_id]->value<<"\n";
     return SUCCESS;
 }
+
+
+typedef AVLTree<int,AVLTree<int,Employee*>*> AVLAVL;
+
+AVLAVL* findRightMostLessOrEqualThanM(AVLAVL* tree, bool* found, int m){
+    while(tree->right != nullptr && tree->right->rank.NumEmployees > m){
+        tree = tree->right;
+    }
+    *found = (tree->right != nullptr);
+    return (*found) ? tree->right : tree;
+}
+
+template<class Key,class Value>
+long long getSumGradesOnlyInNode(AVLTree<Key,Value>* node){
+    if(node == nullptr){
+        return 0;
+    }
+    long long rank_node = node->rank.SumGrades;
+    long long rank_left = (node->left) ? node->left->rank.SumGrades : 0;
+    long long rank_right = (node->right) ? node->right->rank.SumGrades : 0;
+    return (rank_node - rank_right - rank_left);
+}
+
+
+template<class Key,class Value>
+int getNumEmployeesOnlyInNode(AVLTree<Key,Value>* node){
+    if(node == nullptr){
+        return 0;
+    }
+    int rank_node = node->rank.NumEmployees;
+    int rank_left = (node->left) ? node->left->rank.NumEmployees : 0;
+    int rank_right = (node->right) ? node->right->rank.NumEmployees : 0;
+    return (rank_node - rank_right - rank_left);
+}
+
+AVLTree<int,Employee*>* selectKthElement(AVLTree<int,Employee*>* tree, int k){
+    int left_employees = tree->left->rank.NumEmployees;
+    if(left_employees == k-1){
+        return tree;
+    }
+    else if (left_employees > k-1) {
+        return selectKthElement(tree->left, k);
+    }
+    else if (left_employees < k-1) {
+        return selectKthElement(tree->right, k - left_employees - 1);
+    }
+}
+
+
+
+long long getKTopEmployeesSumGradesInternalTree(AVLTree<int,Employee*>* tree, int k){
+    int num_of_all_employees = tree->rank.NumEmployees;
+    AVLTree<int,Employee*>* iterator = selectKthElement(tree, num_of_all_employees - k);
+    // points to employee with rank m-k (smaller than Top Employees By one)
+    long long sum = 0;
+    SonType son_type;
+    while (iterator != nullptr){
+        son_type = whichSonIsNode<int,Employee*>(iterator);
+        switch (son_type){
+            case root: {}
+            case isRight: {}
+            case isLeft: {
+                sum += getSumGradesOnlyInNode<int,Employee*>(iterator->parent);
+                sum += getSumGradesOnlyInNode<int,Employee*>(iterator->parent->right);
+            }
+        }
+        iterator = iterator->parent;
+    }
+    return sum;
+}
+
+void iterateAndSum (AVLAVL* tree ,int m, long long* sum_grades, int* count_added){
+    //TODO DELETE ASSERT
+    assert((*count_added) <= m);
+    if(tree == nullptr || (*count_added) == m ){
+        return;
+    }
+    bool* found = new bool();
+    AVLAVL* v = findRightMostLessOrEqualThanM(tree, found, m);
+    // If found, then V is the Right most node with <=m employees
+    if(*found){
+        if(v->rank.NumEmployees == m - (*count_added)){
+            *sum_grades += v->rank.SumGrades;
+            *count_added += v->rank.NumEmployees;
+            return;
+        }
+        else if(v->rank.NumEmployees < m - (*count_added)){
+            *sum_grades += v->rank.SumGrades;
+            *count_added += v->rank.NumEmployees;
+            if(getNumEmployeesOnlyInNode<int,AVLTree<int,Employee*>*>(v->parent) > m - (*count_added)){
+                *sum_grades += getKTopEmployeesSumGradesInternalTree(v->parent->value, m - (*count_added));
+                *count_added = m;
+                return;
+            }
+            else{ // parent doesn't have enough employees, take all of them and go left
+                *sum_grades += getSumGradesOnlyInNode<int,AVLTree<int,Employee*>*>(v->parent);
+                *count_added += getNumEmployeesOnlyInNode<int,AVLTree<int,Employee*>*>(v->parent);
+                iterateAndSum(v->parent->left,m,sum_grades,count_added);
+            }
+        }
+    }
+    else{ //if there's >m employees in v
+        *sum_grades += getKTopEmployeesSumGradesInternalTree(v->value, m - (*count_added));
+        *count_added = m;
+        return;
+    }
+    delete(found);
+    return;
+}
+
+
+StatusType Workplace::sumGradesBetweenTop(int comp_id, int m)
+{
+    if(m<=0 || comp_id <0 || comp_id>this->companies->size){
+        return INVALID_INPUT;
+    }
+    if(comp_id == 0)
+    {
+        if(this->non_zero_sal<m)
+            return FAILURE;
+
+        long long* sum_grades = new long long();
+        int* count_added = new int();
+        (*sum_grades) = 0;
+        (*count_added) = 0;
+        iterateAndSum(this->emp_sals, m,sum_grades,count_added);
+        //TODO what to do with result?? (sum_grades)
+    }
+    else{
+        // unsure how hash table works
+        // i already implemented the finding of SumGradesBetweenTop in one AVLTree<int,Employee*>
+        // just need to to fetch the emp tree of a specific company
+        // and call the right functions
+    }
+}
+
