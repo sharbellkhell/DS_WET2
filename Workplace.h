@@ -11,7 +11,8 @@ class Workplace{
         HashTable<Employee*>* employees;
         AVLTree<int,AVLTree<int,Employee*>*>* emp_sals;
         int non_zero_sal;
-
+        long long zero_sal_grades;
+        long long zero_sal_count;
         explicit Workplace(int k);
         ~Workplace() = default;
         static Workplace init(int k);
@@ -20,8 +21,8 @@ class Workplace{
         StatusType acquireCompany(int acq_id, int target_id,double factor);
         StatusType employeeSalIncrease(int emp_id,int sal_increase);
         StatusType promoteEmp(int emp_id, int bump_grade);
-        StatusType sumGradesBetweenTop(int comp_id, int m, void* sum);
-        StatusType averageGradeInRange(int comp_id, int l_sal, int h_sal, void* average);
+        StatusType sumGradesBetweenTop(int comp_id, int m);
+        StatusType averageGradeInRange(int comp_id, int l_sal, int h_sal);
         StatusType compValue(int comp_id);
         StatusType promoteAllInRange(int l_sal, int h_sal, int bump_grade);//bonus
 };
