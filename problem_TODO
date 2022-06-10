@@ -10,3 +10,6 @@ we could solve this by maybe:
 2. keep insertnode without updating the search path, in each file we use insertNode we create and replace it with a function 
 that both calls insertnode and calls a function that updates the search path 
 3.. 
+
+
+need to add de'tor to UF

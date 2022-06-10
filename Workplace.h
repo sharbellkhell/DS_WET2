@@ -25,6 +25,7 @@ class Workplace{
         StatusType averageGradeInRange(int comp_id, int l_sal, int h_sal);
         StatusType compValue(int comp_id);
         StatusType promoteAllInRange(int l_sal, int h_sal, int bump_grade);//bonus
+        void Quit();
 };
 
 

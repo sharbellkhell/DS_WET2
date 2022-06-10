@@ -422,3 +422,12 @@ StatusType Workplace::sumGradesBetweenTop(int comp_id, int m)
     }
 }
 
+void Workplace::Quit()
+{
+    while(this->emp_sals!=nullptr)
+    {
+        this->emp_sals=removeDuplicate(this->emp_sals->key,this->emp_sals->value->value->EmployeeId,this->emp_sals);
+    }
+    delete this->employees;
+    delete[] this->companies;
+}
