@@ -79,14 +79,15 @@ struct HashTable{
             elements=new_elements;
         }
 
-        bool remove(int id)
+        bool remove(int id, int re=0)//if re isnt 0 dont rehash
         {
             int index=hashIndex(id);
             try{
                 elements[index]=removeNode(elements[index],id);
             }catch(...){return false;}
             num_elements--;
-            checkIfRehashNeeded();
+            if(re == 0)
+                checkIfRehashNeeded();
             return true;
         }
 

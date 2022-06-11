@@ -4,6 +4,7 @@
 #include <iostream>
 #include "Company.h"
 #include "UF.h"
+#include "UF.cpp"
 
 class Workplace{
     public:
@@ -15,7 +16,7 @@ class Workplace{
         long long zero_sal_count;
         explicit Workplace(int k);
         ~Workplace() = default;
-        static Workplace init(int k);
+        static Workplace* init(int k);
         StatusType addEmployee(int emp_id, int comp_id, int grade);
         StatusType removeEmployee(int emp_id);
         StatusType acquireCompany(int acq_id, int target_id,double factor);
