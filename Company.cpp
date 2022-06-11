@@ -12,6 +12,9 @@ Company::Company(int company_id,int value) : companyId(company_id),value(value),
 Company::~Company()
 {
     Quit(workersSal);
+    for(int i=0;i<workersId->array_size;i++)
+        while(workersId->elements[i]!=nullptr)
+            workersId->remove(workersId->elements[i]->key,1);
     delete workersId;
 }
 static AVLTree<int,AVLTree<int,Employee*>*>* insertDuplicate(int sal,Employee* emp,AVLTree<int,AVLTree<int,Employee*>*>* root)

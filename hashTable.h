@@ -22,10 +22,10 @@ struct HashTable{
             for(int i=0;i<START_SIZE;i++)
                 elements[i]=nullptr;
         }
-        ~HashTable(){
+        ~HashTable(){/*
             for(int i=0;i<array_size;i++)
                 if(elements[i]!=nullptr)
-                    delete elements[i];
+                    delete elements[i];*/
             delete[] elements;
         }
 

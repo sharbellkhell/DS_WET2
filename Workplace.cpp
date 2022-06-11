@@ -69,6 +69,8 @@ StatusType Workplace::addEmployee(int emp_id, int comp_id, int grade)
     }
     this->zero_sal_count++;
     this->zero_sal_grades+=grade;
+    this->employees->insertToTable(emp_id,temp);
+    this->companies->Elements[comp_id]->workersId->insertToTable(emp_id,temp);
     return SUCCESS;
 }
 
@@ -82,6 +84,7 @@ StatusType Workplace::removeEmployee(int emp_id)
     if(temp_emp->value->salary>0)
     {
         this->emp_sals=removeDuplicateNode(temp_emp->value->salary,emp_id,this->emp_sals);
+        this->companies->Elements[temp_emp->value->EmployerId]->workersSal=removeDuplicateNode(temp_emp->value->salary,emp_id,this->emp_sals);
         this->non_zero_sal--;
     }
     if(temp_emp->value->salary==0)
@@ -90,6 +93,7 @@ StatusType Workplace::removeEmployee(int emp_id)
         this->zero_sal_grades-=temp_emp->value->grade;
     }
     this->employees->remove(emp_id);
+    this->companies->Elements[temp_emp->value->EmployerId]->workersId->remove(emp_id);
     delete(temp_emp);
     return SUCCESS;
 }
@@ -121,9 +125,11 @@ StatusType Workplace::acquireCompany(int acq_id, int target_id,double factor)
     AVLTree<int,AVLTree<int,Employee*>*>* temp = this->companies->Elements[target]->workersSal;
     while(temp!=nullptr && temp->value!=nullptr)
     {
+        temp->value->value->EmployerId=acq;
         this->companies->Elements[acq]->workersSal=insertDuplicateNode(temp->value->value->salary,temp->value->value,this->companies->Elements[acq]->workersSal);
         temp=removeDuplicateNode(temp->value->value->salary,temp->value->value->EmployeeId,temp);
     }
+    mergeHash(this->companies->Elements[acq]->workersId,this->companies->Elements[target]->workersId);
     return SUCCESS;
 }
 
@@ -441,6 +447,12 @@ void Workplace::Quit()
     {
         this->emp_sals=removeDuplicateNode(this->emp_sals->key,this->emp_sals->value->value->EmployeeId,this->emp_sals);
     }
+    for(int i=0;i<this->employees->array_size;i++)
+        while(this->employees->elements[i]!=nullptr)
+        {
+            delete this->employees->elements[i]->value;
+            this->employees->remove(this->employees->elements[i]->key,1);
+        }
     delete this->employees;
     delete this->companies;
 }
