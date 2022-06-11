@@ -16,7 +16,7 @@ UF::UF(int size):
 }
 
 bool UF::isRoot(key Key){
-    return (Parents[current] == current);
+    return (Parents[Key] == Key);
 
 }
 
@@ -33,13 +33,17 @@ void UF::MakeSet(int i){
 
 void UF::InitAllElements(){
     assert(current == 0);
-
+    Elements[current] = nullptr;
+    Parents[current] = current; // Root is parent of itself
+    Sizes[current] = 0;
+    Last_Values[current]=0;
+    current++;
     for(int i = 1; i < size+1; i++ ){
         MakeSet(i);
     }
 }
 
-
+/*
 double UF::aux_find(key Key)
 {
     if(Parents[Key]==Key)
@@ -48,16 +52,17 @@ double UF::aux_find(key Key)
     Last_Values[Key]=Elements[Parents[Key]]->value;
     return Elements[Key]->value;
 }
+*/
 key UF::Find(key Key){
     if(Parents[Key]==Key)
         return Elements[Key]->value;
     key root=Key;
-    while(Parents[root]==root)
+    while(Parents[root]!=root)
         root=Parents[root];
-    double result=aux_find(Key);
+   // double result=aux_find(Key);
     key iterator=Key;
     key temp=0;
-    while(Parents[iterator]==iterator)
+    while(Parents[iterator]!=iterator)
         {
             temp=Parents[iterator];
             Parents[iterator]=root;
@@ -68,10 +73,10 @@ key UF::Find(key Key){
 
 T* UF::Union(key Key1, key Key2){
     key Root1 = Key1, Root2 = Key2;
-    if(!isRoot(Root1)){
+    if(isRoot(Root1)){
         Root1 =  Find(Root1);
     }
-    if(!isRoot(Root2)){
+    if(isRoot(Root2)){
         Root2 =  Find(Root2);
     }
     assert(Sizes[Root1] != INT_MAX && Sizes[Root2] != INT_MAX);
@@ -104,10 +109,10 @@ UF::~UF() {
     for(int i = 0; i < size + 1; i++){ //TODO from zero or one?
         delete Elements[i];
     }
-    delete Elements;
-    delete Parents;
-    delete Sizes;
-    delete Last_Values;
+    delete[] Elements;
+    delete[] Parents;
+    delete[] Sizes;
+    delete[] Last_Values;
 }
 
 

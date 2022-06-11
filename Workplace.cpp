@@ -92,10 +92,6 @@ StatusType Workplace::removeEmployee(int emp_id)
     return SUCCESS;
 }
 
-static void mergeSals(AVLTree<int,AVLTree<int,Employee*>*>* acq,AVLTree<int,AVLTree<int,Employee*>*>* target, int id)
-{
-    //maybe useless
-}
 StatusType Workplace::acquireCompany(int acq_id, int target_id,double factor)
 {
     int k = this->companies->size;

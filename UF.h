@@ -1,6 +1,7 @@
 #ifndef DS_WET2_UF_H
 #define DS_WET2_UF_H
 #include "Company.h"
+#include "Company.cpp"
 
 typedef int key;
 typedef Company T;
@@ -17,16 +18,17 @@ public:
 
 
     UF(int size);
-    virtual ~UF();
+    ~UF();
     void InitAllElements();
     bool isRoot(key Key);
     void MakeSet(int index);
     key Find(key Key);
     T* Union(key Key1, key Key2);
     bool UpdateLastValue(int index, double new_value);
-
+/*
 private:
     double aux_find(key Key);
+    */
 };
 
 
