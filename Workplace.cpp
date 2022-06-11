@@ -103,6 +103,8 @@ StatusType Workplace::acquireCompany(int acq_id, int target_id,double factor)
         return INVALID_INPUT;
     int acq=this->companies->Find(acq_id);
     int target=this->companies->Find(target_id);
+    if(acq==target)
+        return INVALID_INPUT;
     this->companies->Elements[acq]->value+=(factor*this->companies->Elements[target]->value);
     this->companies->Last_Values[target]=this->companies->Elements[acq]->value;
     AVLTree<int,AVLTree<int,Employee*>*>* temp = this->companies->Elements[target]->workersSal;
