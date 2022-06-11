@@ -168,6 +168,49 @@ StatusType Workplace::compValue(int comp_id)
     return SUCCESS;
 }
 
+static AVLTree<int,AVLTree<int,Employee*>*>* out_side_right(AVLTree<int,AVLTree<int,Employee*>*>* sal_tree, int h_sal)
+{
+    while(sal_tree!=nullptr)
+    {
+        if(sal_tree->key>h_sal)
+            return sal_tree;
+        sal_tree=sal_tree->right;
+    }
+    return nullptr;
+}
+
+static AVLTree<int,AVLTree<int,Employee*>*>* out_side_left(AVLTree<int,AVLTree<int,Employee*>*>* sal_tree, int l_sal)
+{
+    while(sal_tree!=nullptr)
+    {
+        if(sal_tree->key<l_sal)
+            return sal_tree;
+        sal_tree=sal_tree->left;
+    }
+    return nullptr;
+}
+
+static AVLTree<int,AVLTree<int,Employee*>*>* in_side_right(AVLTree<int,AVLTree<int,Employee*>*>* sal_tree, int h_sal)
+{
+    while(sal_tree!=nullptr)
+    {
+        if(sal_tree->key<=h_sal)
+            return sal_tree;
+        sal_tree=sal_tree->left;
+    }
+    return nullptr;
+}
+
+static AVLTree<int,AVLTree<int,Employee*>*>* in_side_left(AVLTree<int,AVLTree<int,Employee*>*>* sal_tree, int l_sal)
+{
+    while(sal_tree!=nullptr)
+    {
+        if(sal_tree->key>=l_sal)
+            return sal_tree;
+        sal_tree=sal_tree->right;
+    }
+    return nullptr;
+}
 static long long aux_averageGrade(AVLTree<int,AVLTree<int,Employee*>*>* sal_tree, int l_sal, int h_sal, long long zero_sum_grade=0, long long zero_worker_count=0)
 {
     //find first node in range
@@ -226,49 +269,6 @@ static long long aux_averageGrade(AVLTree<int,AVLTree<int,Employee*>*>* sal_tree
         return -1;
     return sum_grades/worker_count;
     
-}
-static AVLTree<int,AVLTree<int,Employee*>*>* out_side_right(AVLTree<int,AVLTree<int,Employee*>*>* sal_tree, int h_sal)
-{
-    while(sal_tree!=nullptr)
-    {
-        if(sal_tree->key>h_sal)
-                return sal_tree;
-        sal_tree=sal_tree->right;
-    }
-    return nullptr;
-}
-
-static AVLTree<int,AVLTree<int,Employee*>*>* out_side_left(AVLTree<int,AVLTree<int,Employee*>*>* sal_tree, int l_sal)
-{
-    while(sal_tree!=nullptr)
-    {
-        if(sal_tree->key<l_sal)
-                return sal_tree;
-        sal_tree=sal_tree->left;
-    }
-    return nullptr;
-}
-
-static AVLTree<int,AVLTree<int,Employee*>*>* in_side_right(AVLTree<int,AVLTree<int,Employee*>*>* sal_tree, int h_sal)
-{
-    while(sal_tree!=nullptr)
-    {
-        if(sal_tree->key<=h_sal)
-                return sal_tree;
-        sal_tree=sal_tree->left;
-    }
-    return nullptr;
-}
-
-static AVLTree<int,AVLTree<int,Employee*>*>* in_side_left(AVLTree<int,AVLTree<int,Employee*>*>* sal_tree, int l_sal)
-{
-    while(sal_tree!=nullptr)
-    {
-        if(sal_tree->key>=l_sal)
-                return sal_tree;
-        sal_tree=sal_tree->right;
-    }
-    return nullptr;
 }
 StatusType Workplace::averageGradeInRange(int comp_id, int l_sal, int h_sal)
 {
@@ -402,24 +402,22 @@ StatusType Workplace::sumGradesBetweenTop(int comp_id, int m)
     if(m<=0 || comp_id <0 || comp_id>this->companies->size){
         return INVALID_INPUT;
     }
+    long long* sum_grades = new long long();
+    int* count_added = new int();
+    (*sum_grades) = 0;
+    (*count_added) = 0;
     if(comp_id == 0)
     {
-        if(this->non_zero_sal<m)
+        if(this->non_zero_sal<m){
             return FAILURE;
-
-        long long* sum_grades = new long long();
-        int* count_added = new int();
-        (*sum_grades) = 0;
-        (*count_added) = 0;
+        }
         iterateAndSum(this->emp_sals, m,sum_grades,count_added);
-        //TODO what to do with result?? (sum_grades)
     }
     else{
-        // unsure how hash table works
-        // i already implemented the finding of SumGradesBetweenTop in one AVLTree<int,Employee*>
-        // just need to to fetch the emp tree of a specific company
-        // and call the right functions
+        iterateAndSum(companies->Elements[comp_id]->workersSal, m, sum_grades,count_added);
     }
+    printf("sumOfBumpGradeBetweenTopWorkersByGroup: %.1f\n", sum_grades);
+
 }
 
 void Workplace::Quit()

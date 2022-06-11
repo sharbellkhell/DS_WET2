@@ -17,6 +17,7 @@ public:
 
 
     UF(int size);
+    virtual ~UF();
     void InitAllElements();
     bool isRoot(key Key);
     void MakeSet(int index);

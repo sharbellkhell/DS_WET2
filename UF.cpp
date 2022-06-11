@@ -21,6 +21,9 @@ bool UF::isRoot(key Key){
 }
 
 void UF::MakeSet(int i){
+    if ( i <= 0 || i > size+1){
+        return;
+    }
     Elements[current] = new Company(i,i);
     Parents[current] = current; // Root is parent of itself
     Sizes[current] = 1;
@@ -36,9 +39,7 @@ void UF::InitAllElements(){
     }
 }
 
-//key UF::FindCheckAndUpdate(key Key){
-//
-//}
+
 double UF::aux_find(key Key)
 {
     if(Parents[Key]==Key)
@@ -97,6 +98,16 @@ bool UF::UpdateLastValue(int index, double new_value){
     double last_value = Last_Values[index];
     Last_Values[index] = new_value;
     return (last_value == new_value);
+}
+
+UF::~UF() {
+    for(int i = 0; i < size + 1; i++){ //TODO from zero or one?
+        delete Elements[i];
+    }
+    delete Elements;
+    delete Parents;
+    delete Sizes;
+    delete Last_Values;
 }
 
 
