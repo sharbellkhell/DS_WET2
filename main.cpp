@@ -32,6 +32,35 @@ void PrintTree(AVLTree<int,Employee*>* root){
 
 }
 
+template<class T>
+void PrintArr(T* arr, int size){
+    for(int i = 0; i < size+1; i++){
+        std::cout << arr[i] << ", ";
+    }
+    std::cout << std::endl;
+}
+
+void PrintCompArr(Company** arr, int size){
+    for(int i = 0; i < size+1; i++){
+        std::cout << "(" << arr[i]->companyId << "," << arr[i]->value << ")" << ", ";
+    }
+    std::cout << std::endl;
+}
+
+void PrintCurrUF(UF* uf){
+
+    std::cout << "Elements: ";
+    PrintCompArr(uf->Elements,uf->size);
+    std::cout << "Parents:     ";
+    PrintArr<key>(uf->Parents, uf->size);
+    std::cout << "Sizes:       ";
+    PrintArr<int>(uf->Sizes,uf->size);
+    std::cout << "Last_Values: ";
+    PrintArr<double>(uf->Last_Values, uf->size);
+    std::cout << "end of UF" << std::endl;
+
+}
+
 int main(){
     Employee* e1 = new Employee(1,1, 1000, 10);
     Employee* e2 = new Employee(2,1, 1000, 4);
