@@ -9,7 +9,7 @@
 class Workplace{
     public:
         UF* companies;
-        HashTable<Employee*>* employees;
+        HashTable* employees;
         AVLTree<int,AVLTree<int,Employee*>*>* emp_sals;
         int non_zero_sal;
         long long zero_sal_grades;

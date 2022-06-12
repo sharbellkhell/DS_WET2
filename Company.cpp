@@ -6,17 +6,8 @@
 #include "Company.h"
 
 Company::Company(int company_id,int value) : companyId(company_id),value(value),parent_value(0) {
-    workersId = new HashTable<Employee*>();
+    workersId = new HashTable();
     workersSal = nullptr;
-}
-Company::~Company()
-{
-    if(workersSal!=nullptr && workersSal->value!=nullptr)
-        Quit(workersSal);
-    for(int i=0;i<workersId->array_size;i++)
-        while(workersId->elements!= nullptr && workersId->elements[i]!=nullptr)
-            workersId->remove(workersId->elements[i]->key,1);
-    delete workersId;
 }
 static AVLTree<int,AVLTree<int,Employee*>*>* insertDuplicate(int sal,Employee* emp,AVLTree<int,AVLTree<int,Employee*>*>* root)
 {
@@ -47,6 +38,8 @@ static AVLTree<int,AVLTree<int,Employee*>*>* removeDuplicate(int sal,int emp_id,
 {
     AVLTree<int,AVLTree<int,Employee*>*>* temp=findNode(root,sal);
     AVLTree<int,AVLTree<int,Employee*>*>* rank_fixer=temp;
+    if(temp==nullptr)
+        return root;
     if(temp!=nullptr){
         AVLTree<int,Employee*>* temp_emp=findNode(temp->value,emp_id);
         while(temp_emp!=nullptr && rank_fixer!=nullptr){
@@ -60,6 +53,15 @@ static AVLTree<int,AVLTree<int,Employee*>*>* removeDuplicate(int sal,int emp_id,
         root=removeNode(root,sal);
     }
     return root;
+}
+Company::~Company()
+{
+    while(workersSal!=nullptr) 
+        this->workersSal=removeDuplicate(this->workersSal->value->value->salary,this->workersSal->value->value->EmployeeId,this->workersSal);
+    for(int i=0;i<workersId->array_size;i++)
+        while(workersId->elements!= nullptr && workersId->elements[i]!=nullptr)
+            workersId->remove(workersId->elements[i]->key,1);
+    delete workersId;
 }
 
 StatusType Company::AddEmployee(Employee* emp){

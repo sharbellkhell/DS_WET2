@@ -19,7 +19,7 @@ class Company{
         int companyId;
         double value;
         double parent_value;
-        HashTable<Employee*>* workersId;
+        HashTable* workersId;
         AVLTree<int,AVLTree<int,Employee*>*>* workersSal;
         Company(int company_id,int value);
         ~Company();

@@ -107,6 +107,11 @@ bool UF::UpdateLastValue(int index, double new_value){
 
 UF::~UF() {
     for(int i = 0; i < size + 1; i++){ //TODO from zero or one?
+        if(Elements[i]!=nullptr && Elements[i]->workersId->num_elements!=0)
+            for(int j=0;j<Elements[i]->workersId->array_size;j++)
+                while(Elements[i]->workersId->elements[j]!=nullptr){
+                        Elements[i]->workersId->remove(Elements[i]->workersId->elements[j]->key,1);
+            }
         delete Elements[i];
     }
     delete[] Elements;
