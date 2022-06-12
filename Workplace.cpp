@@ -192,23 +192,25 @@ StatusType Workplace::employeeSalIncrease(int emp_id,int sal_increase)
 
 StatusType Workplace::promoteEmp(int emp_id, int bump_grade)
 {
-    if(emp_id<=0)//maybe negative is ok
+    if(emp_id <= 0)
         return INVALID_INPUT;
     AVLTree<int, Employee*>* target=this->employees->find(emp_id);
-    if(target==nullptr)
+    if(target == nullptr || target->value == nullptr)
         return FAILURE;
     if(bump_grade<=0)
         return SUCCESS;
-    target->value->grade+=bump_grade;
-    target=target->parent;
-    this->zero_sal_grades+=bump_grade;
-    while(target->parent!=nullptr)
+    target->value->grade += bump_grade;
+    if(target->value->salary == 0){
+        this->zero_sal_grades+=bump_grade;
+    }
+    while(target != nullptr)
     {
         target->rank.SumGrades+=bump_grade;
         target=target->parent;
     }
     return SUCCESS;
 }
+
 
 StatusType Workplace::compValue(int comp_id)
 {
