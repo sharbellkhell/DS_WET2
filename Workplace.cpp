@@ -116,6 +116,15 @@ static void mergeHash(int acq_id ,HashTable* acq,HashTable* target)
     target->elements[0]=nullptr;
     target->array_size=1;
 }
+static Employee* getNextWorkerInHash(HashTable* hash)
+{
+    if(hash->num_elements==0)
+        return nullptr;
+    for(int i=0;i<hash->array_size;i++)
+        if(hash->elements[i]!=nullptr)
+            return hash->elements[i]->value;
+    return nullptr;
+}
 StatusType Workplace::acquireCompany(int acq_id, int target_id,double factor)
 {
     int k = this->companies->size;
@@ -132,10 +141,22 @@ StatusType Workplace::acquireCompany(int acq_id, int target_id,double factor)
     AVLTree<int,AVLTree<int,Employee*>*>* acq_sals=this->companies->Elements[acq]->workersSal;
     HashTable* target_hash=this->companies->Elements[target]->workersId;
     HashTable* acq_hash=this->companies->Elements[acq]->workersId;
-    for(int i=0;i<target_hash->array_size;i++)
+    Employee* next=getNextWorkerInHash(this->companies->Elements[target]->workersId);
+    while(next!=nullptr)
+    {
+        
+        Employee* save= new Employee(next->EmployeeId,acq,next->salary,next->grade);
+        this->removeEmployee(next->EmployeeId);
+        this->addEmployee(save->EmployeeId,save->EmployerId,save->grade);
+        if(save->salary!=0)
+            this->employeeSalIncrease(save->EmployeeId,save->salary);
+        delete save;
+        next=getNextWorkerInHash(this->companies->Elements[target]->workersId);
+    }
+    /*for(int i=0;i<target_hash->array_size;i++)
     {
         while(target_hash->elements[i]!=nullptr)
-        {
+        {   
             target_hash->elements[i]->value->EmployerId=acq_id;
             Employee* temp_emp=target_hash->elements[i]->value;
             acq_hash->insertToTable(temp_emp->EmployeeId,temp_emp);
@@ -147,17 +168,17 @@ StatusType Workplace::acquireCompany(int acq_id, int target_id,double factor)
             target_hash->remove(temp_emp->EmployeeId,1);
         }
     }
-    /*while(temp!=nullptr)
+    while(temp!=nullptr)
     {
         temp->value->value->EmployerId=acq;
         this->companies->Elements[acq]->workersSal=insertDuplicateNode(temp->value->value->salary,temp->value->value,this->companies->Elements[acq]->workersSal);
         temp=removeDuplicateNode(temp->value->value->salary,temp->value->value->EmployeeId,temp);
     }
-    mergeHash(acq, this->companies->Elements[acq]->workersId,this->companies->Elements[target]->workersId);*/
+    mergeHash(acq, this->companies->Elements[acq]->workersId,this->companies->Elements[target]->workersId);
     delete[] target_hash->elements;
     target_hash->elements=new AVLTree<int,Employee*>*[1];
     target_hash->elements[0]=nullptr;
-    target_hash->array_size=1;
+    target_hash->array_size=1;*/
     return SUCCESS;
 }
 
@@ -200,8 +221,11 @@ StatusType Workplace::promoteEmp(int emp_id, int bump_grade)
     if(bump_grade<=0)
         return SUCCESS;
     target->value->grade+=bump_grade;
+    target->rank.SumGrades+=bump_grade;
     target=target->parent;
     this->zero_sal_grades+=bump_grade;
+    if(target==nullptr)
+        return SUCCESS;
     while(target->parent!=nullptr)
     {
         target->rank.SumGrades+=bump_grade;

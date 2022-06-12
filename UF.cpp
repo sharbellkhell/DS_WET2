@@ -55,17 +55,26 @@ double UF::aux_find(key Key)
 */
 key UF::Find(key Key){
     if(Parents[Key]==Key)
-        return Elements[Key]->value;
+        return Key;
     key root=Key;
+    key before_root;
     while(Parents[root]!=root)
+    {
+        if(Parents[root]=Parents[Parents[root]])
+            before_root=root;
         root=Parents[root];
+    }
    // double result=aux_find(Key);
     key iterator=Key;
+
     key temp=0;
+    double diff=Elements[root]->value-Last_Values[before_root];
     while(Parents[iterator]!=iterator)
         {
             temp=Parents[iterator];
             Parents[iterator]=root;
+            Elements[iterator]->value+=diff;
+            Last_Values[iterator]=Elements[Parents[iterator]]->value;
             iterator=temp;
         }
     return root;
@@ -73,12 +82,10 @@ key UF::Find(key Key){
 
 T* UF::Union(key Key1, key Key2){
     key Root1 = Key1, Root2 = Key2;
-    if(isRoot(Root1)){
-        Root1 =  Find(Root1);
-    }
-    if(isRoot(Root2)){
-        Root2 =  Find(Root2);
-    }
+    while(Root1!=Parents[Root1])
+        Root1=Parents[Root1];
+    while(Root2!=Parents[Root2])
+        Root2=Parents[Root2];
     assert(Sizes[Root1] != INT_MAX && Sizes[Root2] != INT_MAX);
     key absolute_root;
 
