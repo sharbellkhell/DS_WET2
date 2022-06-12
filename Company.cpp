@@ -11,9 +11,10 @@ Company::Company(int company_id,int value) : companyId(company_id),value(value),
 }
 Company::~Company()
 {
-    Quit(workersSal);
+    if(workersSal!=nullptr && workersSal->value!=nullptr)
+        Quit(workersSal);
     for(int i=0;i<workersId->array_size;i++)
-        while(workersId->elements[i]!=nullptr)
+        while(workersId->elements!= nullptr && workersId->elements[i]!=nullptr)
             workersId->remove(workersId->elements[i]->key,1);
     delete workersId;
 }
