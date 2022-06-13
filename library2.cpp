@@ -126,7 +126,12 @@ void Quit(void** DS){
     if(DS == nullptr){
         return;
     }
+<<<<<<< HEAD
     (*((Workplace**)DS))->Quit();
     delete( (*((Workplace**)DS)));
     (*((Workplace**)DS)) = nullptr;
+=======
+    ((Workplace*)DS)->Quit();
+    *DS = nullptr;
+>>>>>>> e18c115e2bc27772919f3fd996bcb41118df9463
 }
