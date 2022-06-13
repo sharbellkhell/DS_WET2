@@ -5,7 +5,7 @@ void *Init(int k){
     if(k <= 0){
         return nullptr;
     }
-    Workplace* DS = new Workplace(k);
+    Workplace* DS = Workplace::init(k);
     return (void*)DS;
 }
 
@@ -125,6 +125,7 @@ void Quit(void** DS){
     if(DS == nullptr){
         return;
     }
-    ((Workplace*)DS)->Quit();
-    DS = nullptr;
+    (*((Workplace**)DS))->Quit();
+    delete( (*((Workplace**)DS)));
+    (*((Workplace**)DS)) = nullptr;
 }
