@@ -18,6 +18,8 @@ class Company{
     public:
         int companyId;
         double value;
+        int nonZeroWorkers;
+        int nonZeroGrades;
         int nonZeroCompEmps;
         HashTable* workersId;
         AVLTree<int,AVLTree<int,Employee*>*>* workersSal;

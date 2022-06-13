@@ -28,7 +28,7 @@ typedef enum {
 } StatusType;
 
 
-void *Init(int k);
+void* Init(int k);
 
 StatusType AddEmployee(void *DS, int employeeID, int companyID, int grade);
 
