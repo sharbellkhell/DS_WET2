@@ -1,4 +1,8 @@
+#include "Employee.h"
+#include "AVLTree.h"
+#include "UF.h"
 #include "Workplace.h"
+#include "Company.h"
 
 Workplace::Workplace(int k): non_zero_sal(0), zero_sal_count(0), zero_sal_grades(0){
     companies = new UF(k);
@@ -54,7 +58,6 @@ static AVLTree<int,AVLTree<int,Employee*>*>* removeDuplicateNode(int sal,int emp
     temp->value = removeNode(temp->value,emp_id); 
     if(temp->value==nullptr){
         root=removeNode(root,sal);
-        root=nullptr;
     }
     return root;
 }
@@ -63,6 +66,7 @@ StatusType Workplace::addEmployee(int emp_id, int comp_id, int grade)
 {
     if(emp_id<=0 || comp_id<=0 || grade<0 || comp_id>this->companies->size)
         return INVALID_INPUT;
+    comp_id=this->companies->Find(comp_id);
     Employee* temp = new Employee(emp_id,comp_id,0,grade);
     if(this->employees->insertToTable(emp_id,temp)==false)
     {
@@ -187,10 +191,10 @@ StatusType Workplace::employeeSalIncrease(int emp_id,int sal_increase)
     if(emp_id<=0||sal_increase<=0)
         return INVALID_INPUT;
     AVLTree<int, Employee*>* target=this->employees->find(emp_id);
-    int comp_id=target->value->EmployerId;
-    AVLTree<int, Employee*>* copy=this->companies->Elements[comp_id]->workersId->find(emp_id);
     if(target==nullptr)
         return FAILURE;
+    int comp_id=target->value->EmployerId;
+    AVLTree<int, Employee*>* copy=this->companies->Elements[comp_id]->workersId->find(emp_id);
     this->zero_sal_count--;
     this->zero_sal_grades-=target->value->grade;
     target->value->salary+=sal_increase;
@@ -500,6 +504,7 @@ StatusType Workplace::sumGradesBetweenTop(int comp_id, int m)
 
 void Workplace::Quit()
 {
+    
     while(this->emp_sals!=nullptr)
     {
         this->emp_sals=removeDuplicateNode(this->emp_sals->key,this->emp_sals->value->value->EmployeeId,this->emp_sals);
