@@ -25,10 +25,10 @@ static AVLTree<int,AVLTree<int,Employee*>*>* insertDuplicateNode(int sal,Employe
         AVLTree<int, Employee*>* sal_Range=init(emp->EmployeeId,emp);
         sal_Range->rank.NumEmployees=1;
         sal_Range->rank.SumGrades=emp->grade;
-        root=insertNode(sal,sal_Range,root);
+        root=insertNode(sal,sal_Range,root,emp->grade);
     }
     else{
-        temp->value=insertNode(emp->EmployeeId,emp,temp->value);
+        temp->value=insertNode(emp->EmployeeId,emp,temp->value,emp->grade);
         temp->rank.NumEmployees++;
         temp->rank.SumGrades+=emp->grade;
         temp=temp->parent;
