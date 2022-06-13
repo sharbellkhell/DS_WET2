@@ -1,94 +1,62 @@
-#include "Employee.h"
-#include "AVLTree.h"
-#include "UF.h"
+#include "library2.cpp"
 
-#define INSERT(EI) \
-tree = insertNode(EI->EmployeeId,EI,tree,EI->grade);
+// template<class T>
+// void PrintArr(T* arr, int size){
+//     for(int i = 1; i < size+1; i++){
+//         std::cout << arr[i] << ", ";
+//     }
+//     std::cout << std::endl;
+// }
 
-#define WHOIS(EI) \
-std::cout << "id:" << EI->EmployeeId << " ,grade:" << EI->grade << " ,sal:" << EI->salary << std::endl;
+// void PrintCompArr(Company** arr, int size){
+//     for(int i = 1; i < size+1; i++){
+//         std::cout << "(" << arr[i]->companyId << "," << arr[i]->value << ")" << ", ";
+//     }
+//     std::cout << std::endl;
+// }
 
-void printTreeInternal(AVLTree<int,Employee*>* root, std::string indent, bool last) {
-    if (root != nullptr) {
-        std::cout << indent;
-        if (last) {
-            std::cout << "R----";
-            indent += "   ";
-        } else {
-            std::cout << "L----";
-            indent += "|  ";
-        }
-        std::cout << "key:" << root->key << " ,rank:" << root->rank.NumEmployees <<
-                " ,sum:" << root->rank.SumGrades <<  std::endl;
-        printTreeInternal(root->left, indent, false);
-        printTreeInternal(root->right, indent, true);
-    }
-}
+// void PrintCurrUF(UF* uf){
 
-void PrintTree(AVLTree<int,Employee*>* root){
-    printTreeInternal(root, "", true);
-    std::cout << std::endl;
-    std::cout << std::endl;
+//     std::cout << "Elements: ";
+//     PrintCompArr(uf->Elements,uf->size);
+//     std::cout << "Parents:     ";
+//     PrintArr<key>(uf->Parents, uf->size);
+//     std::cout << "Sizes:       ";
+//     PrintArr<int>(uf->Sizes,uf->size);
+//     std::cout << "Last_Values: ";
+//     PrintArr<double>(uf->Last_Values, uf->size);
+//     std::cout << "end of UF" << std::endl;
 
-}
+// }
 
-template<class T>
-void PrintArr(T* arr, int size){
-    for(int i = 0; i < size+1; i++){
-        std::cout << arr[i] << ", ";
-    }
-    std::cout << std::endl;
-}
-
-void PrintCompArr(Company** arr, int size){
-    for(int i = 0; i < size+1; i++){
-        std::cout << "(" << arr[i]->companyId << "," << arr[i]->value << ")" << ", ";
-    }
-    std::cout << std::endl;
-}
-
-void PrintCurrUF(UF* uf){
-
-    std::cout << "Elements: ";
-    PrintCompArr(uf->Elements,uf->size);
-    std::cout << "Parents:     ";
-    PrintArr<key>(uf->Parents, uf->size);
-    std::cout << "Sizes:       ";
-    PrintArr<int>(uf->Sizes,uf->size);
-    std::cout << "Last_Values: ";
-    PrintArr<double>(uf->Last_Values, uf->size);
-    std::cout << "end of UF" << std::endl;
-
-}
-
-int main(){
-    Employee* e1 = new Employee(1,1, 1000, 10);
-    Employee* e2 = new Employee(2,1, 1000, 4);
-    Employee* e3 = new Employee(3,1, 1000, 7);
-    Employee* e4 = new Employee(4,1, 1000, 8);
-    Employee* e5 = new Employee(5,1, 1000, 25);
-
-
-    WHOIS(e1)
-    WHOIS(e2)
-    WHOIS(e3)
-    WHOIS(e4)
-    WHOIS(e5)
-
-    AVLTree<int, Employee*>* tree = insertNode<int,Employee*>(e1->EmployeeId,e1, nullptr, e1->grade);
-    PrintTree(tree);
-    INSERT(e2)
-    PrintTree(tree);
-    INSERT(e3)
-    PrintTree(tree);
-    INSERT(e4)
-    PrintTree(tree);
-    INSERT(e5)
-    PrintTree(tree);
-
-
-
-
-
-
+int main() {
+ void* ds = Init(10);
+ //PrintCurrUF(((Workplace*)ds)->companies);
+ AddEmployee(ds,18,6,31);
+ AddEmployee(ds,1,2,4);
+ AddEmployee(ds,499104,2,15);
+ AddEmployee(ds,-2,-2,33);
+ AddEmployee(ds,16,3,13);
+ AddEmployee(ds,13,9,13);
+ RemoveEmployee(ds,1);
+ RemoveEmployee(ds,18);
+ AddEmployee(ds,3,10,39);
+ AcquireCompany(ds,4,9,1);
+EmployeeSalaryIncrease(ds,16,2);
+PromoteEmployee(ds,13,1);
+SumOfBumpGradeBetweenTopWorkersByGroup(ds,4,1);
+AverageBumpGradeBetweenSalaryByGroup(ds,4,-1,2);
+CompanyValue(ds,8);
+AcquireCompany(ds,10,8,3);
+AcquireCompany(ds,8,7,4);
+EmployeeSalaryIncrease(ds,499104,6);
+EmployeeSalaryIncrease(ds,3,1);
+PromoteEmployee(ds,13,10);
+CompanyValue(ds,8);
+CompanyValue(ds,7);
+PromoteEmployee(ds,16,7);
+AverageBumpGradeBetweenSalaryByGroup(ds,5,2,6);
+SumOfBumpGradeBetweenTopWorkersByGroup(ds,9,1);
+CompanyValue(ds,10);
+Quit(&ds);
 }
