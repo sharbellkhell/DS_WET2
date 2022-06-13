@@ -92,6 +92,7 @@ StatusType Workplace::removeEmployee(int emp_id)
         this->companies->Elements[temp_emp->value->EmployerId]->workersSal=removeDuplicateNode(temp_emp->value->salary,emp_id,this->companies->Elements[temp_emp->value->EmployerId]->workersSal);
         this->emp_sals=removeDuplicateNode(temp_emp->value->salary,emp_id,this->emp_sals);
         this->non_zero_sal--;
+        this->companies->Elements[temp_emp->value->EmployerId]->nonZeroCompEmps--;
     }
     if(temp_emp->value->salary==0)
     {
@@ -204,6 +205,7 @@ StatusType Workplace::employeeSalIncrease(int emp_id,int sal_increase)
         this->emp_sals=removeDuplicateNode(sal,emp_id,this->emp_sals);
         this->companies->Elements[comp_id]->workersSal=removeDuplicateNode(sal,emp_id,this->companies->Elements[comp_id]->workersSal);
         this->non_zero_sal--;
+        this->companies->Elements[comp_id]->nonZeroCompEmps--;
     }
     if(sal!=0)
     {
@@ -211,6 +213,7 @@ StatusType Workplace::employeeSalIncrease(int emp_id,int sal_increase)
         //Employee* temp= new Employee(copy->value->EmployeeId,copy->value->EmployerId,copy->value->salary,copy->value->grade);
         this->companies->Elements[comp_id]->workersSal=insertDuplicateNode(sal,copy->value,this->companies->Elements[comp_id]->workersSal);
         this->non_zero_sal++;
+        this->companies->Elements[comp_id]->nonZeroCompEmps++;
     }
     return SUCCESS;
 }
@@ -495,9 +498,12 @@ StatusType Workplace::sumGradesBetweenTop(int comp_id, int m)
         iterateAndSum(this->emp_sals, m,sum_grades,count_added);
     }
     else{
+        if(companies->Elements[comp_id]->nonZeroCompEmps < m){
+            return FAILURE;
+        }
         iterateAndSum(companies->Elements[comp_id]->workersSal, m, sum_grades,count_added);
     }
-    printf("sumOfBumpGradeBetweenTopWorkersByGroup: %.1f\n", sum_grades);
+    printf("SumOfBumpGradeBetweenTopWorkersByGroup: %.1f\n", sum_grades);
     return SUCCESS;
 
 }
@@ -509,7 +515,7 @@ void Workplace::Quit()
     {
         this->emp_sals=removeDuplicateNode(this->emp_sals->key,this->emp_sals->value->value->EmployeeId,this->emp_sals);
     }
-    for(int j=1;j<this->companies->size;j++)
+    for(int j=1;j<this->companies->size+1;j++)
     {
         while(this->companies->Elements[j]->workersSal!=nullptr)
         {
