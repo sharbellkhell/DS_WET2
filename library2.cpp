@@ -1,12 +1,11 @@
 #include "library2.h"
 #include "Workplace.h"
-#include "Workplace.cpp"
 
-void* Init(int k){
+void *Init(int k){
     if(k <= 0){
         return nullptr;
     }
-    Workplace* DS = Workplace::init(k);
+    Workplace* DS = new Workplace(k);
     return (void*)DS;
 }
 
@@ -126,12 +125,6 @@ void Quit(void** DS){
     if(DS == nullptr){
         return;
     }
-<<<<<<< HEAD
-    (*((Workplace**)DS))->Quit();
-    delete( (*((Workplace**)DS)));
-    (*((Workplace**)DS)) = nullptr;
-=======
     ((Workplace*)DS)->Quit();
-    *DS = nullptr;
->>>>>>> e18c115e2bc27772919f3fd996bcb41118df9463
+    DS = nullptr;
 }
