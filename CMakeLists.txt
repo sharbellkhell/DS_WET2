@@ -14,9 +14,8 @@ add_executable(DS_WET2
         exceptions.h
         hashTable.h
         library2.h
-        main.cpp
         RankInfo.h
         UF.cpp
         UF.h
         Workplace.cpp
-        Workplace.h)
+        Workplace.h main.cpp)

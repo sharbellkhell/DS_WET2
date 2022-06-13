@@ -92,6 +92,7 @@ StatusType Workplace::removeEmployee(int emp_id)
         this->companies->Elements[temp_emp->value->EmployerId]->workersSal=removeDuplicateNode(temp_emp->value->salary,emp_id,this->companies->Elements[temp_emp->value->EmployerId]->workersSal);
         this->emp_sals=removeDuplicateNode(temp_emp->value->salary,emp_id,this->emp_sals);
         this->non_zero_sal--;
+        this->companies->Elements[temp_emp->value->EmployerId]->nonZeroCompEmps--;
     }
     if(temp_emp->value->salary==0)
     {
@@ -204,6 +205,7 @@ StatusType Workplace::employeeSalIncrease(int emp_id,int sal_increase)
         this->emp_sals=removeDuplicateNode(sal,emp_id,this->emp_sals);
         this->companies->Elements[comp_id]->workersSal=removeDuplicateNode(sal,emp_id,this->companies->Elements[comp_id]->workersSal);
         this->non_zero_sal--;
+        this->companies->Elements[comp_id]->nonZeroCompEmps--;
     }
     if(sal!=0)
     {
@@ -211,6 +213,7 @@ StatusType Workplace::employeeSalIncrease(int emp_id,int sal_increase)
         //Employee* temp= new Employee(copy->value->EmployeeId,copy->value->EmployerId,copy->value->salary,copy->value->grade);
         this->companies->Elements[comp_id]->workersSal=insertDuplicateNode(sal,copy->value,this->companies->Elements[comp_id]->workersSal);
         this->non_zero_sal++;
+        this->companies->Elements[comp_id]->nonZeroCompEmps++;
     }
     return SUCCESS;
 }
@@ -291,7 +294,7 @@ static AVLTree<int,AVLTree<int,Employee*>*>* in_side_left(AVLTree<int,AVLTree<in
     }
     return nullptr;
 }
-static double aux_averageGrade(AVLTree<int,AVLTree<int,Employee*>*>* sal_tree, int l_sal, int h_sal, long long zero_sum_grade=0, long long zero_worker_count=0)
+static long long aux_averageGrade(AVLTree<int,AVLTree<int,Employee*>*>* sal_tree, int l_sal, int h_sal, long long zero_sum_grade=0, long long zero_worker_count=0)
 {
     //find first node in range
     bool flag = false;
@@ -304,7 +307,7 @@ static double aux_averageGrade(AVLTree<int,AVLTree<int,Employee*>*>* sal_tree, i
         else flag=true;
     }
     if(sal_tree==nullptr)
-        return -1;
+        return 0;
     //lets start, add and subtract the nessecary values around the right bound
     long long sum_grades=zero_sum_grade;
     long long worker_count=zero_worker_count;
@@ -326,7 +329,7 @@ static double aux_averageGrade(AVLTree<int,AVLTree<int,Employee*>*>* sal_tree, i
         }
     }
     flag=false;
-    //do the same for the ledt bound
+    //do the same for the left bound
     AVLTree<int,AVLTree<int,Employee*>*>* left_bound=out_side_left(sal_tree,l_sal);
     while(left_bound!=nullptr)
     {   
@@ -357,7 +360,7 @@ StatusType Workplace::averageGradeInRange(int comp_id, int l_sal, int h_sal)
     AVLTree<int,AVLTree<int,Employee*>*>* target=this->emp_sals;
     if(comp_id!=0)
         target=this->companies->Elements[comp_id]->workersSal;
-    double result;
+    long long result;
     if(h_sal==0 || l_sal==0)
         result = aux_averageGrade(target,l_sal,h_sal,this->zero_sal_grades,this->zero_sal_count);
     else
@@ -489,15 +492,18 @@ StatusType Workplace::sumGradesBetweenTop(int comp_id, int m)
     (*count_added) = 0;
     if(comp_id == 0)
     {
-        if(this->non_zero_sal<m){
+        if(this->non_zero_sal < m){
             return FAILURE;
         }
         iterateAndSum(this->emp_sals, m,sum_grades,count_added);
     }
     else{
+        if(companies->Elements[comp_id]->nonZeroCompEmps < m){
+            return FAILURE;
+        }
         iterateAndSum(companies->Elements[comp_id]->workersSal, m, sum_grades,count_added);
     }
-    printf("sumOfBumpGradeBetweenTopWorkersByGroup: %.1f\n", sum_grades);
+    printf("SumOfBumpGradeBetweenTopWorkersByGroup: %.1f\n", sum_grades);
     return SUCCESS;
 
 }

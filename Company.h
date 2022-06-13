@@ -18,7 +18,7 @@ class Company{
     public:
         int companyId;
         double value;
-        double parent_value;
+        int nonZeroCompEmps;
         HashTable* workersId;
         AVLTree<int,AVLTree<int,Employee*>*>* workersSal;
         Company(int company_id,int value);

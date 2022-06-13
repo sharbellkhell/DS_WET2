@@ -126,5 +126,5 @@ void Quit(void** DS){
         return;
     }
     ((Workplace*)DS)->Quit();
-    DS = nullptr;
+    *DS = nullptr;
 }
