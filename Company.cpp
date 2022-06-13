@@ -5,7 +5,7 @@
 #include "AVLTree.h"
 #include "Company.h"
 
-Company::Company(int company_id,int value) : companyId(company_id),value(value),nonZeroCompEmps(0) {
+Company::Company(int company_id,int value) : companyId(company_id),value(value),parent_value(0) {
     workersId = new HashTable();
     workersSal = nullptr;
 }
@@ -31,7 +31,6 @@ static AVLTree<int,AVLTree<int,Employee*>*>* insertDuplicate(int sal,Employee* e
             temp=temp->parent;
         }
     }
-
     return root;
 }
 

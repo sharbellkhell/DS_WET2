@@ -1,5 +1,6 @@
 #include "library2.h"
 #include "Workplace.h"
+#include "Workplace.cpp"
 
 void *Init(int k){
     if(k <= 0){
@@ -126,5 +127,5 @@ void Quit(void** DS){
         return;
     }
     ((Workplace*)DS)->Quit();
-    *DS = nullptr;
+    DS = nullptr;
 }
