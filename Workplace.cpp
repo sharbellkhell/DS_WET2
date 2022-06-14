@@ -244,14 +244,20 @@
         }
         if(bump_grade<=0)
             return SUCCESS;
+        
+        int comp_id = target->value->EmployerId;
+        int old_grade = target->value->grade;
         int salary = target->value->salary;
+        this->removeEmployee(emp_id);
+        this->addEmployee(emp_id,comp_id,old_grade+bump_grade);
         if(salary != 0){ // in such case also update employee inside trees
+        /*
             int comp_id = target->value->EmployerId;
             int old_grade = target->value->grade;
             this->removeEmployee(emp_id);
-            this->addEmployee(emp_id,comp_id,old_grade+bump_grade);
+            this->addEmployee(emp_id,comp_id,old_grade+bump_grade);*/
             this->employeeSalIncrease(emp_id,salary);
-        }
+        }/*
         else    
             this->companies->Elements[target->value->EmployerId]->nonZeroGrades+=bump_grade;
         target=this->employees->find(emp_id);
@@ -266,7 +272,7 @@
         {
             target->rank.SumGrades+=bump_grade;
             target=target->parent;
-        }
+        }*/
         return SUCCESS;
     }
 
