@@ -150,6 +150,28 @@ AVLTree<Key,Value>* getRoot(AVLTree<Key,Value>* node){
  *                                                ROTATIONS
   --------------------------------------------------------------------------------------------------------------------*/
 
+template<class Key,class Value> //Upcasting
+long long getSumGradesOnlyInNode(AVLTree<Key,Value>* node){
+    if(node == nullptr){
+        return 0;
+    }
+    long long rank_node = node->rank.SumGrades;
+    long long rank_left = (node->left) ? node->left->rank.SumGrades : 0;
+    long long rank_right = (node->right) ? node->right->rank.SumGrades : 0;
+    return (rank_node - rank_right - rank_left);
+}
+
+template<class Key,class Value>
+int getNumEmployeesOnlyInNode(AVLTree<Key,Value>* node){
+    if(node == nullptr){
+        return 0;
+    }
+    int rank_node = node->rank.NumEmployees;
+    int rank_left = (node->left) ? node->left->rank.NumEmployees : 0;
+    int rank_right = (node->right) ? node->right->rank.NumEmployees : 0;
+    return (rank_node - rank_right - rank_left);
+}
+
 template<class Key,class Value>
 AVLTree<Key,Value>* rotateLeft(AVLTree<Key,Value>* A){
     //The following two defs are needed to link nodes with outside tree after rotation
@@ -188,8 +210,14 @@ AVLTree<Key,Value>* rotateLeft(AVLTree<Key,Value>* A){
         }
     }
 
-    B->rank = RankInfo( 2 + nBR.NumEmployees + nBL.NumEmployees + nAL.NumEmployees,
-                        nA.SumGrades);
+//    B->rank = RankInfo(getNumEmployeesOnlyInNode(B) + getNumEmployeesOnlyInNode(A)
+//                        + nBR.NumEmployees + nBL.NumEmployees + nAL.NumEmployees,
+//                        nA.SumGrades);
+//    A->rank = RankInfo(getNumEmployeesOnlyInNode(A) + nAL.NumEmployees + nBL.NumEmployees,
+//                       AOnlySumGrades + nAL.SumGrades + nBL.SumGrades);
+    B->rank = RankInfo(2
+                       + nBR.NumEmployees + nBL.NumEmployees + nAL.NumEmployees,
+                       nA.SumGrades);
     A->rank = RankInfo(1 + nAL.NumEmployees + nBL.NumEmployees,
                        AOnlySumGrades + nAL.SumGrades + nBL.SumGrades);
     return B;
@@ -232,10 +260,17 @@ AVLTree<Key,Value>* rotateRight(AVLTree<Key,Value>* B){
         case root: {break;
         }
     }
-    A->rank = RankInfo( 2 + nAL.NumEmployees + nAR.NumEmployees + nBR.NumEmployees,
-                        nB.SumGrades);
-    B->rank = RankInfo( 1 + nBR.NumEmployees + nAR.NumEmployees,
-                        BOnlySumGrades + nBR.SumGrades + nAR.SumGrades);
+//    A->rank = RankInfo(getNumEmployeesOnlyInNode(A) + getNumEmployeesOnlyInNode(B)
+//                        + nAL.NumEmployees + nAR.NumEmployees + nBR.NumEmployees,
+//                        nB.SumGrades);
+//    B->rank = RankInfo(getNumEmployeesOnlyInNode(B) + nBR.NumEmployees + nAR.NumEmployees,
+//                        BOnlySumGrades + nBR.SumGrades + nAR.SumGrades);
+    A->rank = RankInfo(2
+                       + nAL.NumEmployees + nAR.NumEmployees + nBR.NumEmployees,
+                       nB.SumGrades);
+    B->rank = RankInfo(1 + nBR.NumEmployees + nAR.NumEmployees,
+                       BOnlySumGrades + nBR.SumGrades + nAR.SumGrades);
+
 
     return A;
 }
@@ -347,7 +382,7 @@ void fixUpwardPath(AVLTree<Key,Value>* node, Function function, int grade) {
 
 
 template<class Key,class Value>
-AVLTree<Key,Value>* insertNode(const Key& key, const Value& value, AVLTree<Key,Value>* root = nullptr,int grade = 0 ){
+AVLTree<Key,Value>* insertNode(const Key& key, const Value& value, AVLTree<Key,Value>* root = nullptr,int grade = 0){
     if(root == nullptr){
         AVLTree<Key,Value>* to_return = init(key, value);
         to_return->rank.SumGrades = grade;
@@ -403,6 +438,8 @@ AVLTree<Key,Value>* getSmallestNodeBiggerThan(AVLTree<Key,Value>* node){
     return temp;
 }
 
+
+
 template<class Key, class Value>
 AVLTree<Key,Value>* removeNode(AVLTree<Key,Value>* root, const Key& key , int grade = 0){
     if(key <= 0 || root == nullptr){
@@ -417,24 +454,38 @@ AVLTree<Key,Value>* removeNode(AVLTree<Key,Value>* root, const Key& key , int gr
     AVLTree<Key,Value>* new_parent = to_remove->parent;
     AVLTree<Key,Value>* swap_with = to_remove;
     AVLTree<Key,Value>* new_root;
+    long long only_to_remove_sum_grades = getSumGradesOnlyInNode(to_remove);
+    int only_to_remove_num_employees = getNumEmployeesOnlyInNode(to_remove);
     switch(DoesNodeHaveChildren(to_remove)){
         case HasTwoSons:{
             swap_with = getSmallestNodeBiggerThan(to_remove);
+            long long swap_subtree_sum = swap_with->rank.SumGrades - getSumGradesOnlyInNode(to_remove);
+            int swap_subtree_num = swap_with->rank.NumEmployees - getNumEmployeesOnlyInNode(to_remove);
             swapData(to_remove, swap_with);
+            swap_with->rank = RankInfo(swap_subtree_num + only_to_remove_num_employees,
+                                       swap_subtree_sum + only_to_remove_sum_grades);
             removeNode(swap_with,swap_with->key);
             new_root = getRoot(to_remove);
             break;
         }
         case HasRightSon: {
             swap_with = to_remove->right;
+            long long swap_subtree_sum = swap_with->rank.SumGrades - getSumGradesOnlyInNode(to_remove);
+            int swap_subtree_num = swap_with->rank.NumEmployees - getNumEmployeesOnlyInNode(to_remove);
             swapData(to_remove, swap_with);
+            swap_with->rank = RankInfo(swap_subtree_num + only_to_remove_num_employees,
+                                       swap_subtree_sum + only_to_remove_sum_grades);
             removeNode(swap_with,swap_with->key);
             new_root = getRoot(to_remove);
             break;
         }
         case HasLeftSon: {
             swap_with = to_remove->left;
+            long long swap_subtree_sum = swap_with->rank.SumGrades - getSumGradesOnlyInNode(to_remove);
+            int swap_subtree_num = swap_with->rank.NumEmployees - getNumEmployeesOnlyInNode(to_remove);
             swapData(to_remove, swap_with);
+            swap_with->rank = RankInfo(swap_subtree_num + only_to_remove_num_employees,
+                                       swap_subtree_sum + only_to_remove_sum_grades);
             removeNode(swap_with,swap_with->key);
             new_root = getRoot(to_remove);
             break;
@@ -450,7 +501,7 @@ AVLTree<Key,Value>* removeNode(AVLTree<Key,Value>* root, const Key& key , int gr
             if(new_root==to_remove)
                 new_root=nullptr;
             delete(to_remove);
-            break; //TODO memory isn't being freed
+            break;
     }
     return new_root;
 }
