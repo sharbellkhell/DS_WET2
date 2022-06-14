@@ -415,9 +415,9 @@ AVLAVL* findRightMostLessOrEqualThanM(AVLAVL* tree, bool* found, int m){
     // If found, then V is the Right most node with <=m employees
     if(tree->rank.NumEmployees <= m){
         (*found) = true;
-        return tree;
     }
     assert(tree->right != nullptr); //TODO DELETE ASSERT
+    return tree;
 }
 
 template<class Key,class Value>
