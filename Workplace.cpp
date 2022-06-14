@@ -17,8 +17,11 @@ Workplace* Workplace::init(int k)
     return workplace;
 }
 
-static AVLTree<int,AVLTree<int,Employee*>*>* insertDuplicateNode(int sal,Employee* emp,AVLTree<int,AVLTree<int,Employee*>*>* root)
+
+static AVLTree<int,AVLTree<int,Employee*>*>* insertDuplicateNode(int sal,Employee* emp,
+                                                                 AVLTree<int,AVLTree<int,Employee*>*>* root)
 {
+
     AVLTree<int,AVLTree<int,Employee*>*>* temp=findNode(root,sal);
     if(temp==nullptr)
     {
@@ -223,8 +226,23 @@ StatusType Workplace::promoteEmp(int emp_id, int bump_grade)
     if(emp_id <= 0)
         return INVALID_INPUT;
     AVLTree<int, Employee*>* target=this->employees->find(emp_id);
-    if(target == nullptr || target->value == nullptr)
+    if(target == nullptr || target->value == nullptr) {
         return FAILURE;
+    }
+    int salary = target->value->salary;
+    if(salary != 0){ // in such case also update employee inside trees
+        int comp_id = target->value->EmployerId;
+        int old_grade = target->value->grade;
+        Employee* emp_general = new Employee(emp_id,comp_id,salary,old_grade+bump_grade);
+        Employee* emp_company = new Employee(emp_id,comp_id,salary,old_grade+bump_grade);
+        this->emp_sals=removeDuplicateNode(salary,emp_id,this->emp_sals);
+        this->emp_sals=insertDuplicateNode(salary,emp_general,this->emp_sals);
+        this->companies->Elements[comp_id]->workersSal=
+                removeDuplicateNode(salary,emp_id, this->companies->Elements[comp_id]->workersSal);
+        this->companies->Elements[comp_id]->workersSal=
+                insertDuplicateNode(salary,emp_company,this->companies->Elements[comp_id]->workersSal);
+    }
+
     if(bump_grade<=0)
         return SUCCESS;
     target->value->grade+=bump_grade;
