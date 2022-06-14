@@ -248,7 +248,7 @@ StatusType Workplace::promoteEmp(int emp_id, int bump_grade)
         this->employeeSalIncrease(emp_id,salary);
 
     }
-
+    target=this->employees->find(emp_id);
     target->value->grade+=bump_grade;
     target->rank.SumGrades+=bump_grade;
     if(target->value->salary==0)
