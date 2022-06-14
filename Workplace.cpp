@@ -49,18 +49,20 @@ static AVLTree<int,AVLTree<int,Employee*>*>* removeDuplicateNode(int sal,int emp
 {
     AVLTree<int,AVLTree<int,Employee*>*>* temp=findNode(root,sal);
     AVLTree<int,AVLTree<int,Employee*>*>* rank_fixer=temp;
+    AVLTree<int,Employee*>* emp=findNode(temp->value,emp_id);
+    int g=emp->value->grade;
     if(temp!=nullptr){
         AVLTree<int,Employee*>* temp_emp=findNode(temp->value,emp_id);
-        while(temp_emp!=nullptr && rank_fixer!=nullptr){
+        while(temp_emp!=nullptr && rank_fixer!=nullptr && root!=rank_fixer){
             rank_fixer->rank.NumEmployees--;
             rank_fixer->rank.SumGrades-=temp_emp->value->grade;
             rank_fixer=rank_fixer->parent;
         }
 
     }
-    temp->value = removeNode(temp->value,emp_id); 
+    temp->value = removeNode(temp->value,emp_id,g); 
     if(temp->value==nullptr){
-        root=removeNode(root,sal);
+        root=removeNode(root,sal,g);
     }
     return root;
 }
@@ -235,6 +237,8 @@ StatusType Workplace::promoteEmp(int emp_id, int bump_grade)
     if(target == nullptr || target->value == nullptr) {
         return FAILURE;
     }
+    if(bump_grade<=0)
+        return SUCCESS;
     int salary = target->value->salary;
     if(salary != 0){ // in such case also update employee inside trees
         int comp_id = target->value->EmployerId;
@@ -245,12 +249,11 @@ StatusType Workplace::promoteEmp(int emp_id, int bump_grade)
 
     }
 
-    if(bump_grade<=0)
-        return SUCCESS;
     target->value->grade+=bump_grade;
     target->rank.SumGrades+=bump_grade;
+    if(target->value->salary==0)
+        this->zero_sal_grades+=bump_grade;
     target=target->parent;
-    this->zero_sal_grades+=bump_grade;
     if(target==nullptr)
         return SUCCESS;
     while(target->parent!=nullptr)
