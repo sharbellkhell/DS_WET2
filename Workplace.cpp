@@ -239,14 +239,10 @@ StatusType Workplace::promoteEmp(int emp_id, int bump_grade)
     if(salary != 0){ // in such case also update employee inside trees
         int comp_id = target->value->EmployerId;
         int old_grade = target->value->grade;
-        Employee* emp_general = new Employee(emp_id,comp_id,salary,old_grade+bump_grade);
-        Employee* emp_company = new Employee(emp_id,comp_id,salary,old_grade+bump_grade);
-        this->emp_sals=removeDuplicateNode(salary,emp_id,this->emp_sals);
-        this->emp_sals=insertDuplicateNode(salary,emp_general,this->emp_sals);
-        this->companies->Elements[comp_id]->workersSal=
-                removeDuplicateNode(salary,emp_id, this->companies->Elements[comp_id]->workersSal);
-        this->companies->Elements[comp_id]->workersSal=
-                insertDuplicateNode(salary,emp_company,this->companies->Elements[comp_id]->workersSal);
+        this->removeEmployee(emp_id);
+        this->addEmployee(emp_id,comp_id,old_grade+bump_grade);
+        this->employeeSalIncrease(emp_id,salary);
+
     }
 
     if(bump_grade<=0)
@@ -533,12 +529,16 @@ StatusType Workplace::sumGradesBetweenTop(int comp_id, int m)
     if(comp_id == 0)
     {
         if(this->non_zero_sal<m){
+            delete sum_grades;
+            delete count_added;
             return FAILURE;
         }
         iterateAndSum(this->emp_sals, m,sum_grades,count_added);
     }
     else{
         if(companies->Elements[comp_id]->nonZeroCompEmps < m){
+            delete sum_grades;
+            delete count_added;
             return FAILURE;
         }
         iterateAndSum(companies->Elements[comp_id]->workersSal, m, sum_grades,count_added);
