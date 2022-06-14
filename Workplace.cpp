@@ -49,11 +49,7 @@ static AVLTree<int,AVLTree<int,Employee*>*>* removeDuplicateNode(int sal,int emp
 {
     AVLTree<int,AVLTree<int,Employee*>*>* temp=findNode(root,sal);
     AVLTree<int,AVLTree<int,Employee*>*>* rank_fixer=temp;
-    if(temp==nullptr)
-	return root;
     AVLTree<int,Employee*>* emp=findNode(temp->value,emp_id);
-    if(emp==nullptr	)
-	return root;
     int g=emp->value->grade;
     if(temp!=nullptr){
         AVLTree<int,Employee*>* temp_emp=findNode(temp->value,emp_id);
@@ -216,8 +212,8 @@ StatusType Workplace::employeeSalIncrease(int emp_id,int sal_increase)
     int sal=target->value->salary;
     if(sal-sal_increase!=0){
         this->companies->Elements[comp_id]->nonZeroGrades-=target->value->grade;
-        this->emp_sals=removeDuplicateNode(sal,emp_id,this->emp_sals);
-        this->companies->Elements[comp_id]->workersSal=removeDuplicateNode(sal,emp_id,this->companies->Elements[comp_id]->workersSal);
+        this->emp_sals=removeDuplicateNode(sal-sal_increase,emp_id,this->emp_sals);
+        this->companies->Elements[comp_id]->workersSal=removeDuplicateNode(sal-sal_increase,emp_id,this->companies->Elements[comp_id]->workersSal);
         this->non_zero_sal--;
         this->companies->Elements[comp_id]->nonZeroCompEmps--;
         this->companies->Elements[comp_id]->nonZeroWorkers--;
