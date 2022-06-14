@@ -225,6 +225,8 @@ StatusType Workplace::employeeSalIncrease(int emp_id,int sal_increase)
         this->companies->Elements[comp_id]->workersSal=insertDuplicateNode(sal,copy->value,this->companies->Elements[comp_id]->workersSal);
         this->non_zero_sal++;
         this->companies->Elements[comp_id]->nonZeroCompEmps++;
+        this->companies->Elements[comp_id]->nonZeroWorkers--;
+        this->companies->Elements[comp_id]->nonZeroGrades-=target->value->grade;
     }
     return SUCCESS;
 }
@@ -416,7 +418,6 @@ AVLAVL* findRightMostLessOrEqualThanM(AVLAVL* tree, bool* found, int m){
         return tree;
     }
     assert(tree->right != nullptr); //TODO DELETE ASSERT
-
 }
 
 template<class Key,class Value>
