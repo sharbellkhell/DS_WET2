@@ -1,11 +1,13 @@
+#include <iostream>
 #include "library2.h"
 #include "Workplace.h"
 
-void *Init(int k){
+
+void* Init(int k){
     if(k <= 0){
         return nullptr;
     }
-    Workplace* DS = Workplace::init(k);
+    Workplace* DS = new Workplace(k);
     return (void*)DS;
 }
 

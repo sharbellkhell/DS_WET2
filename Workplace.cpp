@@ -78,6 +78,8 @@ StatusType Workplace::addEmployee(int emp_id, int comp_id, int grade)
     }
     this->zero_sal_count++;
     this->zero_sal_grades+=grade;
+    this->companies->Elements[comp_id]->nonZeroGrades+=grade;
+    this->companies->Elements[comp_id]->nonZeroWorkers++;
     this->companies->Elements[comp_id]->workersId->insertToTable(emp_id,temp);
     delete temp;
     return SUCCESS;
@@ -99,6 +101,8 @@ StatusType Workplace::removeEmployee(int emp_id)
     }
     if(temp_emp->value->salary==0)
     {
+        this->companies->Elements[temp_emp->value->EmployerId]->nonZeroGrades-=temp_emp->value->grade;
+        this->companies->Elements[temp_emp->value->EmployerId]->nonZeroWorkers--;
         this->zero_sal_count--;
         this->zero_sal_grades-=temp_emp->value->grade;
     }
@@ -205,10 +209,12 @@ StatusType Workplace::employeeSalIncrease(int emp_id,int sal_increase)
     copy->value->salary+=sal_increase;
     int sal=target->value->salary;
     if(sal-sal_increase!=0){
+        this->companies->Elements[comp_id]->nonZeroGrades-=target->value->grade;
         this->emp_sals=removeDuplicateNode(sal,emp_id,this->emp_sals);
         this->companies->Elements[comp_id]->workersSal=removeDuplicateNode(sal,emp_id,this->companies->Elements[comp_id]->workersSal);
         this->non_zero_sal--;
         this->companies->Elements[comp_id]->nonZeroCompEmps--;
+        this->companies->Elements[comp_id]->nonZeroWorkers--;
     }
     if(sal!=0)
     {
@@ -368,8 +374,7 @@ static double aux_averageGrade(AVLTree<int,AVLTree<int,Employee*>*>* sal_tree, i
     //return results
     if(worker_count==0)
         return -1;
-    return sum_grades/worker_count;
-    
+    return (double)sum_grades/worker_count;
 }
 StatusType Workplace::averageGradeInRange(int comp_id, int l_sal, int h_sal)
 {
@@ -380,7 +385,10 @@ StatusType Workplace::averageGradeInRange(int comp_id, int l_sal, int h_sal)
         target=this->companies->Elements[comp_id]->workersSal;
     double result;
     if(h_sal==0 || l_sal==0)
-        result = aux_averageGrade(target,l_sal,h_sal,this->zero_sal_grades,this->zero_sal_count);
+        if(comp_id!=0)
+            result = aux_averageGrade(target,l_sal,h_sal,this->companies->Elements[comp_id]->nonZeroGrades,this->companies->Elements[comp_id]->nonZeroWorkers);
+        else  
+            result = aux_averageGrade(target,l_sal,h_sal,this->zero_sal_grades,this->zero_sal_count);  
     else
         result = aux_averageGrade(target,l_sal,h_sal);
     if(result==-1)
