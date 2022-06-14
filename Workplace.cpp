@@ -49,7 +49,11 @@ static AVLTree<int,AVLTree<int,Employee*>*>* removeDuplicateNode(int sal,int emp
 {
     AVLTree<int,AVLTree<int,Employee*>*>* temp=findNode(root,sal);
     AVLTree<int,AVLTree<int,Employee*>*>* rank_fixer=temp;
+    if(temp==nullptr)
+	return root;
     AVLTree<int,Employee*>* emp=findNode(temp->value,emp_id);
+    if(emp==nullptr	)
+	return root;
     int g=emp->value->grade;
     if(temp!=nullptr){
         AVLTree<int,Employee*>* temp_emp=findNode(temp->value,emp_id);
@@ -329,7 +333,7 @@ static double aux_averageGrade(AVLTree<int,AVLTree<int,Employee*>*>* sal_tree, i
             sal_tree=sal_tree->left;
         else flag=true;
     }
-    if(sal_tree==nullptr)
+    if(sal_tree==nullptr && zero_worker_count==0)
         return -1;
     //lets start, add and subtract the nessecary values around the right bound
     long long sum_grades=zero_sum_grade;
@@ -429,7 +433,7 @@ int getNumEmployeesOnlyInNode(AVLTree<Key,Value>* node){
     return (rank_node - rank_right - rank_left);
 }
 
-AVLTree<int,Employee*>* selectKthElement(AVLTree<int,Employee*>* tree, int k){
+AVLTree<int,Employee*>* selectKthElement(AVLTree<int,Employee*>* tree, int k){	
     if(k == 0){
         return  tree;
     }
