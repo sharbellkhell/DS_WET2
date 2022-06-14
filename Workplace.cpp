@@ -411,24 +411,42 @@
 
     typedef AVLTree<int,AVLTree<int,Employee*>*> AVLAVL;
 
-    AVLAVL* findRightMostLessOrEqualThanM(AVLAVL* tree, bool* found, int m){
-        AVLAVL* temp = tree;
-        while(temp->right != nullptr){
-            temp = temp->right;
+    enum PossibleCases {AllBiggerThanM, FoundEqualToM, FoundLessThanM };
+
+    AVLAVL* findRightMostLessOrEqualThanM(AVLAVL* tree, PossibleCases* found, int m){
+        AVLAVL* iterator = tree;
+        if(iterator->right == nullptr){ // one node
+            if(iterator->rank.NumEmployees == m){
+                (*found) = FoundEqualToM;
+                return iterator;
+            } else if(iterator->rank.NumEmployees > m){
+                (*found) = AllBiggerThanM;
+                return iterator;
+            } else{
+                (*found) = FoundLessThanM;
+                return iterator;
+            }
         }
-        if(temp->rank.NumEmployees >= m){
-            (*found) = false; // Case of Rightmost node still has more > employees than m
-            return temp;
+        while(iterator->right != nullptr){
+            iterator = iterator->right; //Iterator is Right Most
         }
-        while(tree->right != nullptr && tree->rank.NumEmployees >= m){
-            tree = tree->right;
+        if(iterator->rank.NumEmployees == m){
+            (*found) = FoundEqualToM;
+            return iterator;
+        } else if (iterator->rank.NumEmployees > m) {
+            (*found) = AllBiggerThanM;
+            return iterator;
         }
-        // If found, then V is the Right most node with <=m employees
-        if(tree->rank.NumEmployees <= m){
-            (*found) = true;
-            return tree;
+        iterator = tree;
+        while(iterator->right != nullptr){
+            if(iterator->rank.NumEmployees < m){
+                (*found) = FoundLessThanM;
+                return iterator;
+            }
+            iterator = iterator->right;
         }
-        assert(tree->right != nullptr); //TODO DELETE ASSERT
+        assert(false == true); //TODO DELETE to check never reaches
+        return nullptr;
     }
 
     template<class Key,class Value>
@@ -508,20 +526,16 @@
         if(tree == nullptr || (*count_added) == m ){
             return;
         }
-        bool* found = new bool();
+        PossibleCases* found = new PossibleCases();
         AVLAVL* v = findRightMostLessOrEqualThanM(tree, found, m - (*count_added));
-    //    if(v->rank.NumEmployees == m - (*count_added)){
-    //        *found = true;
-    //    }
-        // If found, then V is the Right most node with <=m employees
-        if(*found){
-            if(v->rank.NumEmployees == m - (*count_added)){
+        switch (*found) {
+            case FoundEqualToM:{
                 *sum_grades += v->rank.SumGrades;
                 *count_added += v->rank.NumEmployees;
                 delete(found);
                 return;
             }
-            else if(v->rank.NumEmployees < m - (*count_added)){
+            case FoundLessThanM:{
                 *sum_grades += v->rank.SumGrades;
                 *count_added += v->rank.NumEmployees;
                 if(getNumEmployeesOnlyInNode<int,AVLTree<int,Employee*>*>(v->parent) > m - (*count_added)){
@@ -535,13 +549,14 @@
                     *count_added += getNumEmployeesOnlyInNode<int,AVLTree<int,Employee*>*>(v->parent);
                     iterateAndSum(v->parent->left,m,sum_grades,count_added);
                 }
+                break;
             }
-        }
-        else{ //if there's >m employees in v
-            *sum_grades += getKTopEmployeesSumGradesInternalTree(v->value, m - (*count_added));
-            *count_added = m;
-            delete(found);
-            return;
+            case AllBiggerThanM:
+                *sum_grades += getKTopEmployeesSumGradesInternalTree(v->value, m - (*count_added));
+                *count_added = m;
+                delete(found);
+                return;
+
         }
         delete(found);
         return;
@@ -564,7 +579,11 @@
                 delete count_added;
                 return FAILURE;
             }
-            iterateAndSum(this->emp_sals, m,sum_grades,count_added);
+            if(this->emp_sals->rank.NumEmployees == m){
+                (*sum_grades) = this->emp_sals->rank.SumGrades;
+            } else {
+                iterateAndSum(this->emp_sals, m,sum_grades,count_added);
+            }
         }
         else{
             if(companies->Elements[comp_id]->nonZeroCompEmps < m){
@@ -572,7 +591,12 @@
                 delete count_added;
                 return FAILURE;
             }
-            iterateAndSum(companies->Elements[comp_id]->workersSal, m, sum_grades,count_added);
+            if(companies->Elements[comp_id]->workersSal->rank.NumEmployees == m){
+                (*sum_grades) = companies->Elements[comp_id]->workersSal->rank.SumGrades;
+            }
+            else{
+                iterateAndSum(companies->Elements[comp_id]->workersSal, m, sum_grades,count_added);
+            }
         }
         printf("SumOfBumpGradeBetweenTopWorkersByGroup: %.1lld\n", (*sum_grades) );
         delete sum_grades;
