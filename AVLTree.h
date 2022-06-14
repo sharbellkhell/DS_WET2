@@ -315,6 +315,7 @@ void ModifyRanksUpwards(AVLTree<Key,Value>* node, Function function, int grade){
 template<class Key, class Value>
 void fixUpwardPath(AVLTree<Key,Value>* node, Function function, int grade) {
     AVLTree<Key,Value>* original_node = node;
+    ModifyRanksUpwards(original_node, function,grade);
     while( node != nullptr ) {
         int root_bf = getBF(node);
         if (root_bf == 2) {
@@ -342,7 +343,6 @@ void fixUpwardPath(AVLTree<Key,Value>* node, Function function, int grade) {
         }
         node = node->parent;
     }
-    ModifyRanksUpwards(original_node, function,grade);
 }
 
 

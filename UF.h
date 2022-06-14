@@ -1,7 +1,6 @@
 #ifndef DS_WET2_UF_H
 #define DS_WET2_UF_H
 #include "Company.h"
-#include "Company.cpp"
 
 typedef int key;
 typedef Company T;

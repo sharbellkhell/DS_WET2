@@ -4,7 +4,6 @@
 #include <iostream>
 #include "Company.h"
 #include "UF.h"
-#include "UF.cpp"
 
 class Workplace{
     public:

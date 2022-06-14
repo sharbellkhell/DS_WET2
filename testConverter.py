@@ -1,9 +1,10 @@
 
-with open("test_in_converted", "w") as output_file:
+with open("main.cpp", "w") as output_file:
     output_file.write("#include \"library2.h\"\n")
     output_file.write("int main() {\n")
-    with open("test.in.txt", "r") as file_1:
+    with open("in0.txt", "r") as file_1:
         for line in file_1:
+            line = line.replace(":", "")
             line = line.split()
             if line[0] == "Init":
                 code_line = "void* ds = "

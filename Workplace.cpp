@@ -26,8 +26,8 @@ static AVLTree<int,AVLTree<int,Employee*>*>* insertDuplicateNode(int sal,Employe
     if(temp==nullptr)
     {
         AVLTree<int, Employee*>* sal_Range=init(emp->EmployeeId,emp);
-        sal_Range->rank.NumEmployees=1;
-        sal_Range->rank.SumGrades=emp->grade;
+//        sal_Range->rank.NumEmployees=1;
+//        sal_Range->rank.SumGrades=emp->grade;
         root=insertNode(sal,sal_Range,root,emp->grade);
     }
     else{
@@ -399,11 +399,24 @@ StatusType Workplace::averageGradeInRange(int comp_id, int l_sal, int h_sal)
 typedef AVLTree<int,AVLTree<int,Employee*>*> AVLAVL;
 
 AVLAVL* findRightMostLessOrEqualThanM(AVLAVL* tree, bool* found, int m){
-    while(tree->right != nullptr && tree->right->rank.NumEmployees > m){
+    AVLAVL* temp = tree;
+    while(temp->right != nullptr){
+        temp = temp->right;
+    }
+    if(temp->rank.NumEmployees > m){
+        (*found) = false; // Case of Rightmost node still has more > employees than m
+        return temp;
+    }
+    while(tree->right != nullptr && tree->rank.NumEmployees > m){
         tree = tree->right;
     }
-    *found = (tree->right != nullptr);
-    return (*found) ? tree->right : tree;
+    // If found, then V is the Right most node with <=m employees
+    if(tree->rank.NumEmployees <= m){
+        (*found) = true;
+        return tree;
+    }
+    assert(tree->right != nullptr); //TODO DELETE ASSERT
+
 }
 
 template<class Key,class Value>
@@ -484,7 +497,10 @@ void iterateAndSum (AVLAVL* tree ,int m, long long* sum_grades, int* count_added
         return;
     }
     bool* found = new bool();
-    AVLAVL* v = findRightMostLessOrEqualThanM(tree, found, m);
+    AVLAVL* v = findRightMostLessOrEqualThanM(tree, found, m - (*count_added));
+//    if(v->rank.NumEmployees == m - (*count_added)){
+//        *found = true;
+//    }
     // If found, then V is the Right most node with <=m employees
     if(*found){
         if(v->rank.NumEmployees == m - (*count_added)){
