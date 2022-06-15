@@ -3,7 +3,6 @@
     #include "UF.h"
     #include "Workplace.h"
     #include "Company.h"
-    #include "hashTable.h"
 
     Workplace::Workplace(int k): non_zero_sal(0), zero_sal_count(0), zero_sal_grades(0){
         companies = new UF(k);
@@ -12,11 +11,11 @@
         emp_sals = nullptr;
     }
 
-    /*Workplace* Workplace::init(int k)
+    Workplace* Workplace::init(int k)
     {
         Workplace* workplace = new Workplace(k);
         return workplace;
-    }*/
+    }
 
 
     static AVLTree<int,AVLTree<int,Employee*>*>* insertDuplicateNode(int sal,Employee* emp,
@@ -46,15 +45,19 @@
 
     static AVLTree<int,AVLTree<int,Employee*>*>* removeDuplicateNode(int sal,int emp_id,AVLTree<int,AVLTree<int,Employee*>*>* root)
     {
+        bool a=false;
         AVLTree<int,AVLTree<int,Employee*>*>* temp=findNode(root,sal);
        
         AVLTree<int,AVLTree<int,Employee*>*>* rank_fixer=temp;
         AVLTree<int,Employee*>* emp=findNode(temp->value,emp_id);
         int g=emp->value->grade;
-        AVLTree<int,Employee*>* temp_emp=findNode(temp->value,emp_id);
-        while(temp_emp!=nullptr && rank_fixer!=nullptr){
-            rank_fixer->rank.SumGrades-=temp_emp->value->grade;
-            rank_fixer=rank_fixer->parent;
+        if(temp!=nullptr){
+            AVLTree<int,Employee*>* temp_emp=findNode(temp->value,emp_id);
+            while(temp_emp!=nullptr && rank_fixer!=nullptr){
+                rank_fixer->rank.SumGrades-=temp_emp->value->grade;
+                rank_fixer=rank_fixer->parent;
+            }
+
         }
         temp->value = removeNode(temp->value,emp_id,g); 
         if(temp->value==nullptr){
@@ -69,7 +72,7 @@
             return INVALID_INPUT;
         comp_id=this->companies->Find(comp_id);
         Employee* temp = new Employee(emp_id,comp_id,0,grade);
-        if(!(this->employees->insertToTable(emp_id,temp)))
+        if(this->employees->insertToTable(emp_id,temp)==false)
         {
             delete temp;
             return FAILURE;
@@ -90,15 +93,13 @@
         AVLTree<int,Employee*>* temp_emp=this->employees->find(emp_id);
         if(temp_emp==nullptr)
             return FAILURE;
-//        int was=this->emp_sals->rank.SumGrades;
-//        int g=temp_emp->value->grade;
+        int was=this->emp_sals->rank.SumGrades;
+        int g=temp_emp->value->grade;
         if(temp_emp->value->salary>0)
         { 
             //std::cout<<"removing "<<g<<" should be "<<this->emp_sals->rank.SumGrades-g<<"\n";
             this->companies->Elements[temp_emp->value->EmployerId]->workersSal=removeDuplicateNode(temp_emp->value->salary,emp_id,this->companies->Elements[temp_emp->value->EmployerId]->workersSal);
             this->emp_sals=removeDuplicateNode(temp_emp->value->salary,emp_id,this->emp_sals);
-            fixRanksAVLAVL(this->companies->Elements[temp_emp->value->EmployerId]->workersSal);
-            fixRanksAVLAVL(this->emp_sals);
             this->non_zero_sal--;
             this->companies->Elements[temp_emp->value->EmployerId]->nonZeroCompEmps--;
         }
@@ -111,10 +112,11 @@
         }
         this->companies->Elements[temp_emp->value->EmployerId]->workersId->remove(emp_id);
         this->employees->remove(emp_id);
+        temp_emp=this->employees->find(emp_id);
         return SUCCESS;
     }
 
-    /*static void mergeHash(int acq_id ,HashTable* acq,HashTable* target)
+    static void mergeHash(int acq_id ,HashTable* acq,HashTable* target)
     {
         for(int i=0;i<target->array_size;i++)
         {
@@ -129,7 +131,7 @@
         target->elements=new AVLTree<int,Employee*>*[1];
         target->elements[0]=nullptr;
         target->array_size=1;
-    }*/
+    }
     static Employee* getNextWorkerInHash(HashTable* hash)
     {
         if(hash->num_elements==0)
@@ -151,6 +153,10 @@
         this->companies->Union(acq,target);
         this->companies->Elements[acq]->value+=(factor*this->companies->Elements[target]->value);
         this->companies->Last_Values[target]=this->companies->Elements[acq]->value;
+        AVLTree<int,AVLTree<int,Employee*>*>* target_sals = this->companies->Elements[target]->workersSal;
+        AVLTree<int,AVLTree<int,Employee*>*>* acq_sals=this->companies->Elements[acq]->workersSal;
+        HashTable* target_hash=this->companies->Elements[target]->workersId;
+        HashTable* acq_hash=this->companies->Elements[acq]->workersId;
         Employee* next=getNextWorkerInHash(this->companies->Elements[target]->workersId);
         while(next!=nullptr)
         {
@@ -163,13 +169,7 @@
             delete save;
             next=getNextWorkerInHash(this->companies->Elements[target]->workersId);
         }
-        return SUCCESS;
-        /*
-         * AVLTree<int,AVLTree<int,Employee*>*>* target_sals = this->companies->Elements[target]->workersSal;
-        AVLTree<int,AVLTree<int,Employee*>*>* acq_sals=this->companies->Elements[acq]->workersSal;
-        HashTable* target_hash=this->companies->Elements[target]->workersId;
-        HashTable* acq_hash=this->companies->Elements[acq]->workersId;
-         for(int i=0;i<target_hash->array_size;i++)
+        /*for(int i=0;i<target_hash->array_size;i++)
         {
             while(target_hash->elements[i]!=nullptr)
             {   
@@ -195,11 +195,12 @@
         target_hash->elements=new AVLTree<int,Employee*>*[1];
         target_hash->elements[0]=nullptr;
         target_hash->array_size=1;*/
-
+        return SUCCESS;
     }
 
     StatusType Workplace::employeeSalIncrease(int emp_id,int sal_increase)
     {
+        Company* comp=this->companies->Elements[43];
         if(emp_id<=0||sal_increase<=0)
             return INVALID_INPUT;
         AVLTree<int, Employee*>* target=this->employees->find(emp_id);
@@ -212,9 +213,7 @@
         int sal=target->value->salary;
         if(sal-sal_increase!=0){//if salary wasnt 0
             this->emp_sals=removeDuplicateNode(sal-sal_increase,emp_id,this->emp_sals);
-            fixRanksAVLAVL(this->emp_sals);
             this->companies->Elements[comp_id]->workersSal=removeDuplicateNode(sal-sal_increase,emp_id,this->companies->Elements[comp_id]->workersSal);
-            fixRanksAVLAVL(this->companies->Elements[comp_id]->workersSal);
             this->non_zero_sal--;
         }
         else{//salary was 0 it was
@@ -229,10 +228,8 @@
         }
 
         this->emp_sals=insertDuplicateNode(sal,target->value,this->emp_sals);
-        fixRanksAVLAVL(this->emp_sals);
         //Employee* temp= new Employee(copy->value->EmployeeId,copy->value->EmployerId,copy->value->salary,copy->value->grade);
         this->companies->Elements[comp_id]->workersSal=insertDuplicateNode(sal,copy->value,this->companies->Elements[comp_id]->workersSal);
-        fixRanksAVLAVL(this->companies->Elements[comp_id]->workersSal);
         return SUCCESS;
     }
 
@@ -247,6 +244,7 @@
     StatusType Workplace::promoteEmp(int emp_id, int bump_grade)
     {
         
+        Company* comp=this->companies->Elements[26];
         if(emp_id <= 0)
             return INVALID_INPUT;
         AVLTree<int, Employee*>* target=this->employees->find(emp_id);
@@ -255,9 +253,9 @@
         }
         if(bump_grade<=0)
             return SUCCESS;
-//        int was=this->emp_sals->rank.SumGrades;
-//        int old_grade = target->value->grade;
+        int was=this->emp_sals->rank.SumGrades;
         int comp_id = target->value->EmployerId;
+        int old_grade = target->value->grade;
         int salary = target->value->salary;
         AVLTree<int, Employee*>* targett=this->companies->Elements[comp_id]->workersId->find(emp_id);
         target->value->grade+=bump_grade;
@@ -316,7 +314,7 @@
     }
 
 
-    StatusType Workplace::compValue(int comp_id) const
+    StatusType Workplace::compValue(int comp_id)
     {
         if(comp_id <= 0 || comp_id>this->companies->size)
             return INVALID_INPUT;
@@ -372,7 +370,7 @@
     {
         //find first node in range
         bool flag = false;
-        while(sal_tree!=nullptr && (!flag))
+        while(sal_tree!=nullptr && flag==false)
         {
             if(sal_tree->key<l_sal)
                 sal_tree=sal_tree->right;
@@ -424,16 +422,15 @@
         //return results
         if(worker_count==0)
             return -1;
-        return ( (double)(sum_grades)/(double)(worker_count) );
+        return (double)sum_grades/worker_count;
     }
-    StatusType Workplace::averageGradeInRange(int comp_id, int l_sal, int h_sal) const
+    StatusType Workplace::averageGradeInRange(int comp_id, int l_sal, int h_sal)
     {
         if(l_sal<0 || h_sal<0|| h_sal<l_sal || comp_id<0 || comp_id>this->companies->size)
             return INVALID_INPUT;
         AVLTree<int,AVLTree<int,Employee*>*>* target=this->emp_sals;
         if(comp_id!=0)
             target=this->companies->Elements[comp_id]->workersSal;
-        fixRanksAVLAVL(target);
         double result;
         if(h_sal==0 || l_sal==0)
             if(comp_id!=0)
@@ -449,8 +446,31 @@
         return SUCCESS;
     }
 
+//    typedef AVLTree<int,AVLTree<int,Employee*>*> AVLAVL;
 
+    RankInfo fixRanksAVLAVL(AVLAVL* root){
+        if(root == nullptr){
+            return RankInfo();
+        }
+        AVLAVL* original_root = root;
+        if(root->left != nullptr){
+            fixRanksAVLAVL(root->left);
+        }
+        if(root->right != nullptr){
+            fixRanksAVLAVL(root->right);
+        }
+        root = original_root;
+        root->rank.NumEmployees = root->value->rank.NumEmployees
+                                  + fixRanksAVLAVL(root->left).NumEmployees
+                                  + fixRanksAVLAVL(root->right).NumEmployees;
 
+        root->rank.SumGrades = root->value->rank.SumGrades
+                               + fixRanksAVLAVL(root->left).SumGrades
+                               + fixRanksAVLAVL(root->right).SumGrades;
+
+        return RankInfo(root->rank.NumEmployees,root->rank.SumGrades);
+
+    }
 
     enum PossibleCases {AllBiggerThanM, FoundEqualToM, FoundLessThanM };
 
@@ -490,6 +510,7 @@
             }
             iterator = iterator->right;
         }
+        assert(false == true); //TODO DELETE to check never reaches
         return nullptr;
     }
 
@@ -580,11 +601,12 @@
                 return;
 
         }
-
+        delete(found);
+        return;
     }
 
 
-    StatusType Workplace::sumGradesBetweenTop(int comp_id, int m) const
+    StatusType Workplace::sumGradesBetweenTop(int comp_id, int m)
     {
         if(m<=0 || comp_id <0 || comp_id>this->companies->size){
             return INVALID_INPUT;
@@ -600,7 +622,7 @@
                 delete count_added;
                 return FAILURE;
             }
-            fixRanksAVLAVL(this->emp_sals); 
+            fixRanksAVLAVL(this->emp_sals); //TODO
             if(this->non_zero_sal == m){
                 (*sum_grades) = this->emp_sals->rank.SumGrades;
             } else {
