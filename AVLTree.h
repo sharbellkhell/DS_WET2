@@ -3,6 +3,7 @@
 #include <cassert>
 #include "exceptions.h"
 #include "RankInfo.h"
+#include "Employee.h"
 
 enum SonType {isLeft, isRight, root};
 enum NodeChildren {Leaf, HasLeftSon, HasRightSon, HasTwoSons};
@@ -506,6 +507,34 @@ AVLTree<Key,Value>* removeNode(AVLTree<Key,Value>* root, const Key& key , int gr
             break;
     }
     return new_root;
+}
+
+typedef AVLTree<int,AVLTree<int,Employee*>*> AVLAVL;
+
+template<class Key, class Value>
+RankInfo fixRanksAVLAVL(AVLTree<Key,Value>* root){
+    if(root == nullptr){
+        return RankInfo();
+    }
+    AVLTree<Key,Value>* original_root = root;
+    if(root->left != nullptr){
+        fixRanksAVLAVL(root->left); // go down left
+    }
+    if(root->right != nullptr){
+        fixRanksAVLAVL(root->right); // go down right
+    }
+    root = original_root;
+    root->rank.NumEmployees = root->value->rank.NumEmployees
+                              + fixRanksAVLAVL(root->left).NumEmployees
+                              + fixRanksAVLAVL(root->right).NumEmployees;
+
+    root->rank.SumGrades = root->value->rank.SumGrades
+                           + fixRanksAVLAVL(root->left).SumGrades
+                           + fixRanksAVLAVL(root->right).SumGrades;
+
+    return RankInfo(root->rank.NumEmployees,root->rank.SumGrades);
+
+
 }
 
 

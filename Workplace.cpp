@@ -11,11 +11,11 @@
         emp_sals = nullptr;
     }
 
-    Workplace* Workplace::init(int k)
+    /*Workplace* Workplace::init(int k)
     {
         Workplace* workplace = new Workplace(k);
         return workplace;
-    }
+    }*/
 
 
     static AVLTree<int,AVLTree<int,Employee*>*>* insertDuplicateNode(int sal,Employee* emp,
@@ -45,19 +45,15 @@
 
     static AVLTree<int,AVLTree<int,Employee*>*>* removeDuplicateNode(int sal,int emp_id,AVLTree<int,AVLTree<int,Employee*>*>* root)
     {
-        bool a=false;
         AVLTree<int,AVLTree<int,Employee*>*>* temp=findNode(root,sal);
        
         AVLTree<int,AVLTree<int,Employee*>*>* rank_fixer=temp;
         AVLTree<int,Employee*>* emp=findNode(temp->value,emp_id);
         int g=emp->value->grade;
-        if(temp!=nullptr){
-            AVLTree<int,Employee*>* temp_emp=findNode(temp->value,emp_id);
-            while(temp_emp!=nullptr && rank_fixer!=nullptr){
-                rank_fixer->rank.SumGrades-=temp_emp->value->grade;
-                rank_fixer=rank_fixer->parent;
-            }
-
+        AVLTree<int,Employee*>* temp_emp=findNode(temp->value,emp_id);
+        while(temp_emp!=nullptr && rank_fixer!=nullptr){
+            rank_fixer->rank.SumGrades-=temp_emp->value->grade;
+            rank_fixer=rank_fixer->parent;
         }
         temp->value = removeNode(temp->value,emp_id,g); 
         if(temp->value==nullptr){
@@ -72,7 +68,7 @@
             return INVALID_INPUT;
         comp_id=this->companies->Find(comp_id);
         Employee* temp = new Employee(emp_id,comp_id,0,grade);
-        if(this->employees->insertToTable(emp_id,temp)==false)
+        if(!(this->employees->insertToTable(emp_id,temp)))
         {
             delete temp;
             return FAILURE;
@@ -100,6 +96,8 @@
             //std::cout<<"removing "<<g<<" should be "<<this->emp_sals->rank.SumGrades-g<<"\n";
             this->companies->Elements[temp_emp->value->EmployerId]->workersSal=removeDuplicateNode(temp_emp->value->salary,emp_id,this->companies->Elements[temp_emp->value->EmployerId]->workersSal);
             this->emp_sals=removeDuplicateNode(temp_emp->value->salary,emp_id,this->emp_sals);
+            fixRanksAVLAVL(this->companies->Elements[temp_emp->value->EmployerId]->workersSal);
+            fixRanksAVLAVL(this->emp_sals);
             this->non_zero_sal--;
             this->companies->Elements[temp_emp->value->EmployerId]->nonZeroCompEmps--;
         }
@@ -213,7 +211,9 @@
         int sal=target->value->salary;
         if(sal-sal_increase!=0){//if salary wasnt 0
             this->emp_sals=removeDuplicateNode(sal-sal_increase,emp_id,this->emp_sals);
+            fixRanksAVLAVL(this->emp_sals);
             this->companies->Elements[comp_id]->workersSal=removeDuplicateNode(sal-sal_increase,emp_id,this->companies->Elements[comp_id]->workersSal);
+            fixRanksAVLAVL(this->companies->Elements[comp_id]->workersSal);
             this->non_zero_sal--;
         }
         else{//salary was 0 it was
@@ -228,8 +228,10 @@
         }
 
         this->emp_sals=insertDuplicateNode(sal,target->value,this->emp_sals);
+        fixRanksAVLAVL(this->emp_sals);
         //Employee* temp= new Employee(copy->value->EmployeeId,copy->value->EmployerId,copy->value->salary,copy->value->grade);
         this->companies->Elements[comp_id]->workersSal=insertDuplicateNode(sal,copy->value,this->companies->Elements[comp_id]->workersSal);
+        fixRanksAVLAVL(this->companies->Elements[comp_id]->workersSal);
         return SUCCESS;
     }
 
@@ -244,7 +246,6 @@
     StatusType Workplace::promoteEmp(int emp_id, int bump_grade)
     {
         
-        Company* comp=this->companies->Elements[26];
         if(emp_id <= 0)
             return INVALID_INPUT;
         AVLTree<int, Employee*>* target=this->employees->find(emp_id);
@@ -314,7 +315,7 @@
     }
 
 
-    StatusType Workplace::compValue(int comp_id)
+    StatusType Workplace::compValue(int comp_id) const
     {
         if(comp_id <= 0 || comp_id>this->companies->size)
             return INVALID_INPUT;
@@ -424,13 +425,14 @@
             return -1;
         return (double)sum_grades/worker_count;
     }
-    StatusType Workplace::averageGradeInRange(int comp_id, int l_sal, int h_sal)
+    StatusType Workplace::averageGradeInRange(int comp_id, int l_sal, int h_sal) const
     {
         if(l_sal<0 || h_sal<0|| h_sal<l_sal || comp_id<0 || comp_id>this->companies->size)
             return INVALID_INPUT;
         AVLTree<int,AVLTree<int,Employee*>*>* target=this->emp_sals;
         if(comp_id!=0)
             target=this->companies->Elements[comp_id]->workersSal;
+        fixRanksAVLAVL(target);
         double result;
         if(h_sal==0 || l_sal==0)
             if(comp_id!=0)
@@ -446,31 +448,8 @@
         return SUCCESS;
     }
 
-//    typedef AVLTree<int,AVLTree<int,Employee*>*> AVLAVL;
 
-    RankInfo fixRanksAVLAVL(AVLAVL* root){
-        if(root == nullptr){
-            return RankInfo();
-        }
-        AVLAVL* original_root = root;
-        if(root->left != nullptr){
-            fixRanksAVLAVL(root->left);
-        }
-        if(root->right != nullptr){
-            fixRanksAVLAVL(root->right);
-        }
-        root = original_root;
-        root->rank.NumEmployees = root->value->rank.NumEmployees
-                                  + fixRanksAVLAVL(root->left).NumEmployees
-                                  + fixRanksAVLAVL(root->right).NumEmployees;
 
-        root->rank.SumGrades = root->value->rank.SumGrades
-                               + fixRanksAVLAVL(root->left).SumGrades
-                               + fixRanksAVLAVL(root->right).SumGrades;
-
-        return RankInfo(root->rank.NumEmployees,root->rank.SumGrades);
-
-    }
 
     enum PossibleCases {AllBiggerThanM, FoundEqualToM, FoundLessThanM };
 
@@ -510,7 +489,6 @@
             }
             iterator = iterator->right;
         }
-        assert(false == true); //TODO DELETE to check never reaches
         return nullptr;
     }
 
@@ -606,7 +584,7 @@
     }
 
 
-    StatusType Workplace::sumGradesBetweenTop(int comp_id, int m)
+    StatusType Workplace::sumGradesBetweenTop(int comp_id, int m) const
     {
         if(m<=0 || comp_id <0 || comp_id>this->companies->size){
             return INVALID_INPUT;
@@ -622,7 +600,7 @@
                 delete count_added;
                 return FAILURE;
             }
-            fixRanksAVLAVL(this->emp_sals); //TODO
+            fixRanksAVLAVL(this->emp_sals); 
             if(this->non_zero_sal == m){
                 (*sum_grades) = this->emp_sals->rank.SumGrades;
             } else {

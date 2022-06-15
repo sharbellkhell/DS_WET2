@@ -28,8 +28,7 @@ class Workplace{
         void Quit();
 
 };
-    typedef AVLTree<int,AVLTree<int,Employee*>*> AVLAVL;
-    RankInfo fixRanksAVLAVL(AVLAVL* root);
+
 
 
 
