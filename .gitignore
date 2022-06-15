@@ -1,3 +1,4 @@
-/cmake-build-debug/
-/.idea/
-/not on git/
+./cmake-build-debug/
+./.idea/
+./not on git/
+./.local/

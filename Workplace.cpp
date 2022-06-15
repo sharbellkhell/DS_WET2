@@ -3,6 +3,7 @@
     #include "UF.h"
     #include "Workplace.h"
     #include "Company.h"
+    #include "hashTable.h"
 
     Workplace::Workplace(int k): non_zero_sal(0), zero_sal_count(0), zero_sal_grades(0){
         companies = new UF(k);
@@ -89,8 +90,8 @@
         AVLTree<int,Employee*>* temp_emp=this->employees->find(emp_id);
         if(temp_emp==nullptr)
             return FAILURE;
-        int was=this->emp_sals->rank.SumGrades;
-        int g=temp_emp->value->grade;
+//        int was=this->emp_sals->rank.SumGrades;
+//        int g=temp_emp->value->grade;
         if(temp_emp->value->salary>0)
         { 
             //std::cout<<"removing "<<g<<" should be "<<this->emp_sals->rank.SumGrades-g<<"\n";
@@ -110,11 +111,10 @@
         }
         this->companies->Elements[temp_emp->value->EmployerId]->workersId->remove(emp_id);
         this->employees->remove(emp_id);
-        temp_emp=this->employees->find(emp_id);
         return SUCCESS;
     }
 
-    static void mergeHash(int acq_id ,HashTable* acq,HashTable* target)
+    /*static void mergeHash(int acq_id ,HashTable* acq,HashTable* target)
     {
         for(int i=0;i<target->array_size;i++)
         {
@@ -129,7 +129,7 @@
         target->elements=new AVLTree<int,Employee*>*[1];
         target->elements[0]=nullptr;
         target->array_size=1;
-    }
+    }*/
     static Employee* getNextWorkerInHash(HashTable* hash)
     {
         if(hash->num_elements==0)
@@ -151,10 +151,6 @@
         this->companies->Union(acq,target);
         this->companies->Elements[acq]->value+=(factor*this->companies->Elements[target]->value);
         this->companies->Last_Values[target]=this->companies->Elements[acq]->value;
-        AVLTree<int,AVLTree<int,Employee*>*>* target_sals = this->companies->Elements[target]->workersSal;
-        AVLTree<int,AVLTree<int,Employee*>*>* acq_sals=this->companies->Elements[acq]->workersSal;
-        HashTable* target_hash=this->companies->Elements[target]->workersId;
-        HashTable* acq_hash=this->companies->Elements[acq]->workersId;
         Employee* next=getNextWorkerInHash(this->companies->Elements[target]->workersId);
         while(next!=nullptr)
         {
@@ -167,7 +163,13 @@
             delete save;
             next=getNextWorkerInHash(this->companies->Elements[target]->workersId);
         }
-        /*for(int i=0;i<target_hash->array_size;i++)
+        return SUCCESS;
+        /*
+         * AVLTree<int,AVLTree<int,Employee*>*>* target_sals = this->companies->Elements[target]->workersSal;
+        AVLTree<int,AVLTree<int,Employee*>*>* acq_sals=this->companies->Elements[acq]->workersSal;
+        HashTable* target_hash=this->companies->Elements[target]->workersId;
+        HashTable* acq_hash=this->companies->Elements[acq]->workersId;
+         for(int i=0;i<target_hash->array_size;i++)
         {
             while(target_hash->elements[i]!=nullptr)
             {   
@@ -193,12 +195,11 @@
         target_hash->elements=new AVLTree<int,Employee*>*[1];
         target_hash->elements[0]=nullptr;
         target_hash->array_size=1;*/
-        return SUCCESS;
+
     }
 
     StatusType Workplace::employeeSalIncrease(int emp_id,int sal_increase)
     {
-        Company* comp=this->companies->Elements[43];
         if(emp_id<=0||sal_increase<=0)
             return INVALID_INPUT;
         AVLTree<int, Employee*>* target=this->employees->find(emp_id);
@@ -254,9 +255,9 @@
         }
         if(bump_grade<=0)
             return SUCCESS;
-        int was=this->emp_sals->rank.SumGrades;
+//        int was=this->emp_sals->rank.SumGrades;
+//        int old_grade = target->value->grade;
         int comp_id = target->value->EmployerId;
-        int old_grade = target->value->grade;
         int salary = target->value->salary;
         AVLTree<int, Employee*>* targett=this->companies->Elements[comp_id]->workersId->find(emp_id);
         target->value->grade+=bump_grade;
@@ -371,7 +372,7 @@
     {
         //find first node in range
         bool flag = false;
-        while(sal_tree!=nullptr && flag==false)
+        while(sal_tree!=nullptr && (!flag))
         {
             if(sal_tree->key<l_sal)
                 sal_tree=sal_tree->right;
@@ -423,7 +424,7 @@
         //return results
         if(worker_count==0)
             return -1;
-        return (double)sum_grades/worker_count;
+        return ( (double)(sum_grades)/(double)(worker_count) );
     }
     StatusType Workplace::averageGradeInRange(int comp_id, int l_sal, int h_sal) const
     {
@@ -579,8 +580,7 @@
                 return;
 
         }
-        delete(found);
-        return;
+
     }
 
 

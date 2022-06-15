@@ -9,7 +9,6 @@ add_executable(DS_WET2
         AVLTree.h
         Company.cpp
         Company.h
-        Employee.cpp
         Employee.h
         exceptions.h
         hashTable.h
