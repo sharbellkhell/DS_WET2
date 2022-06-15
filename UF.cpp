@@ -1,6 +1,5 @@
 #include "UF.h"
 #include "Company.h"
-#include "Company.cpp"
 #include <climits>
 #include <cassert>
 

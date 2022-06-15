@@ -98,7 +98,6 @@ struct HashTable{
 
         bool remove(int id, int re=0)//if re isnt 0 dont rehash
         {
-            AVLTree<int,Employee*>* one=elements[1];
             AVLTree<int,Employee*>* temp=find(id);
             if(temp==nullptr)
                 return false;

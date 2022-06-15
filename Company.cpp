@@ -1,4 +1,5 @@
 #include <iostream>
+#include "library2.h"
 #include "hashTable.h"
 #include "Employee.h"
 #include "AVLTree.h"
@@ -8,8 +9,7 @@ Company::Company(int company_id,int value) : companyId(company_id),value(value),
     workersId = new HashTable();
     workersSal = nullptr;
 }
-
-/*static AVLTree<int,AVLTree<int,Employee*>*>* insertDuplicate(int sal,Employee* emp,AVLTree<int,AVLTree<int,Employee*>*>* root)
+static AVLTree<int,AVLTree<int,Employee*>*>* insertDuplicate(int sal,Employee* emp,AVLTree<int,AVLTree<int,Employee*>*>* root)
 {
     AVLTree<int,AVLTree<int,Employee*>*>* temp=findNode(root,sal);
     if(temp==nullptr)
@@ -32,7 +32,7 @@ Company::Company(int company_id,int value) : companyId(company_id),value(value),
         }
     }
     return root;
-}*/
+}
 
 static AVLTree<int,AVLTree<int,Employee*>*>* removeDuplicate(int sal,int emp_id,AVLTree<int,AVLTree<int,Employee*>*>* root)
 {
@@ -40,7 +40,7 @@ static AVLTree<int,AVLTree<int,Employee*>*>* removeDuplicate(int sal,int emp_id,
     AVLTree<int,AVLTree<int,Employee*>*>* rank_fixer=temp;
     if(temp==nullptr)
         return root;
-    else{
+    if(temp!=nullptr){
         AVLTree<int,Employee*>* temp_emp=findNode(temp->value,emp_id);
         while(temp_emp!=nullptr && rank_fixer!=nullptr){
             rank_fixer->rank.NumEmployees--;
@@ -56,7 +56,6 @@ static AVLTree<int,AVLTree<int,Employee*>*>* removeDuplicate(int sal,int emp_id,
 }
 Company::~Company()
 {
-    this-> companyId = companyId+1-1;
     while(workersSal!=nullptr) 
         this->workersSal=removeDuplicate(this->workersSal->value->value->salary,this->workersSal->value->value->EmployeeId,this->workersSal);
     for(int i=0;i<workersId->array_size;i++)
@@ -65,7 +64,7 @@ Company::~Company()
     delete workersId;
 }
 
-/*StatusType Company::AddEmployee(Employee* emp){
+StatusType Company::AddEmployee(Employee* emp){
     try{
     this->workersId->insertToTable(emp->EmployeeId,emp);
     if(emp->salary!=0)
@@ -81,7 +80,39 @@ Company::~Company()
     }
     return SUCCESS;
 
-}*/
+}
+static Employee* find_highest_earner(Company* company)
+{
+    AVLTree<int,AVLTree<int,Employee*>*>* temp=company->workersSal;
+    while(temp->right!=nullptr)
+        temp=temp->right;
+    AVLTree<int,Employee*>* emp_temp=temp->value;
+    if(emp_temp==nullptr)
+        return nullptr;
+    while(emp_temp->left!=nullptr)
+        emp_temp=emp_temp->left;
+    return emp_temp->value;
+}
+StatusType Company::RemoveEmployeeByID(const int employee_id)
+{
+    AVLTree<int,Employee*>* employee = this->workersId->find(employee_id);
+    if(employee == nullptr)
+        return FAILURE;
+    int sal_to_remove=employee->value->salary;
+    this->workersId->remove(employee_id);
+    this->workersSal=removeDuplicate(sal_to_remove,employee_id,this->workersSal);
+    return SUCCESS;
+}
+
+void Company::CompanyInfo(int* v,int* c)
+{//send pointer to local ints i.e. int num1=0,int* v=&num1 and then CompanyInfo(v..)
+    *v=this->value;
+}
+
+void Company::setValue(const int value)
+{
+    this->value=value;
+}
 
 
 

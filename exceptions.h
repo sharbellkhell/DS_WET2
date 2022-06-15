@@ -7,6 +7,8 @@ class NodeAlreadyExists : public std::exception{
 };
 class NodeDoesntExist : public std::exception{
 };
+class AllocationError: public std::exception{
+};
 class InvalidInput : public std::exception{
 };
 

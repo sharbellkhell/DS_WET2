@@ -67,7 +67,8 @@
     {
         if(emp_id<=0 || comp_id<=0 || grade<0 || comp_id>this->companies->size)
             return INVALID_INPUT;
-        comp_id=this->companies->Find(comp_id);
+        while(this->companies->Parents[comp_id]!=comp_id)
+            comp_id=this->companies->Parents[comp_id];
         Employee* temp = new Employee(emp_id,comp_id,0,grade);
         if(this->employees->insertToTable(emp_id,temp)==false)
         {
@@ -124,8 +125,12 @@
         int k = this->companies->size;
         if(acq_id<=0 || acq_id>k || target_id<=0 || target_id>k || factor <=0 || acq_id==target_id)
             return INVALID_INPUT;
-        int acq=this->companies->Find(acq_id);
-        int target=this->companies->Find(target_id);
+        int acq=acq_id;
+        while(this->companies->Parents[acq]!=acq)
+            acq=this->companies->Parents[acq];
+        int target=target_id;
+        while(this->companies->Parents[target]!=target)
+            target=this->companies->Parents[target];
         if(acq==target)
             return INVALID_INPUT;
             

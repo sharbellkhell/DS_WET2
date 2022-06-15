@@ -12,7 +12,8 @@ class Employee{
         salary(salary),grade(grade){};
         Employee(const Employee& emp) = default;
         ~Employee() = default;
-
+        void EmployeeInfo(int* employerId, int* sal,int* grade) const;
+        void Promote(int salary,int bump);
 };
 
 

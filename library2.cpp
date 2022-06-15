@@ -19,7 +19,7 @@ StatusType AddEmployee(void *DS, int employeeID, int companyID, int grade){
     try{
         result = ((Workplace*)DS)->addEmployee(employeeID,companyID,grade);
     }
-    catch(std::bad_alloc&){
+    catch(std::bad_alloc){
         return ALLOCATION_ERROR;
     }
     return result;
@@ -33,7 +33,7 @@ StatusType RemoveEmployee(void *DS, int employeeID){
     try{
         result = ((Workplace*)DS)->removeEmployee(employeeID);
     }
-    catch(std::bad_alloc&){
+    catch(std::bad_alloc){
         return ALLOCATION_ERROR;
     }
     return result;
@@ -47,7 +47,7 @@ StatusType AcquireCompany(void *DS, int companyID1, int companyID2, double facto
     try{
         result = ((Workplace*)DS)->acquireCompany(companyID1,companyID2,factor);
     }
-    catch(std::bad_alloc&){
+    catch(std::bad_alloc){
         return ALLOCATION_ERROR;
     }
     return result;
@@ -61,7 +61,7 @@ StatusType EmployeeSalaryIncrease(void *DS, int employeeID, int salaryIncrease){
     try{
         result = ((Workplace*)DS)->employeeSalIncrease(employeeID,salaryIncrease);
     }
-    catch(std::bad_alloc&){
+    catch(std::bad_alloc){
         return ALLOCATION_ERROR;
     }
     return result;
@@ -75,7 +75,7 @@ StatusType PromoteEmployee(void *DS, int employeeID, int bumpGrade){
     try{
         result = ((Workplace*)DS)->promoteEmp(employeeID,bumpGrade);
     }
-    catch(std::bad_alloc&){
+    catch(std::bad_alloc){
         return ALLOCATION_ERROR;
     }
     return result;
@@ -89,7 +89,7 @@ StatusType SumOfBumpGradeBetweenTopWorkersByGroup(void *DS, int companyID, int m
     try{
         result = ((Workplace*)DS)->sumGradesBetweenTop(companyID,m);
     }
-    catch(std::bad_alloc&){
+    catch(std::bad_alloc){
         return ALLOCATION_ERROR;
     }
     return result;
@@ -103,7 +103,7 @@ StatusType AverageBumpGradeBetweenSalaryByGroup(void *DS, int companyID, int low
     try{
         result = ((Workplace*)DS)->averageGradeInRange(companyID,lowerSalary,higherSalary);
     }
-    catch(std::bad_alloc&){
+    catch(std::bad_alloc){
         return ALLOCATION_ERROR;
     }
     return result;
@@ -117,7 +117,7 @@ StatusType CompanyValue(void *DS, int companyID){
     try{
         result = ((Workplace*)DS)->compValue(companyID);
     }
-    catch(std::bad_alloc&){
+    catch(std::bad_alloc){
         return ALLOCATION_ERROR;
     }
     return result;
