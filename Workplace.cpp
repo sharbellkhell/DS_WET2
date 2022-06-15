@@ -149,26 +149,28 @@
         int acq=this->companies->Find(acq_id);
         int target=this->companies->Find(target_id);
         if(acq==target)
-            return INVALID_INPUT;
-        this->companies->Union(acq,target);
-        this->companies->Elements[acq]->value+=(factor*this->companies->Elements[target]->value);
-        this->companies->Last_Values[target]=this->companies->Elements[acq]->value;
+            return INVALID_INPUT;/*
         AVLTree<int,AVLTree<int,Employee*>*>* target_sals = this->companies->Elements[target]->workersSal;
-        AVLTree<int,AVLTree<int,Employee*>*>* acq_sals=this->companies->Elements[acq]->workersSal;
+        AVLTree<int,AVLTree<int,Employee*>*>* acq_sals=this->companies->Elements[acq]->workersSal;*/
         HashTable* target_hash=this->companies->Elements[target]->workersId;
         HashTable* acq_hash=this->companies->Elements[acq]->workersId;
-        Employee* next=getNextWorkerInHash(this->companies->Elements[target]->workersId);
+        Employee* next=getNextWorkerInHash(target_hash);
+        int size=target_hash->array_size;
         while(next!=nullptr)
         {
             
             Employee* save= new Employee(next->EmployeeId,acq,next->salary,next->grade);
             this->removeEmployee(next->EmployeeId);
+            target_hash->remove(save->EmployeeId);
             this->addEmployee(save->EmployeeId,save->EmployerId,save->grade);
             if(save->salary!=0)
                 this->employeeSalIncrease(save->EmployeeId,save->salary);
             delete save;
-            next=getNextWorkerInHash(this->companies->Elements[target]->workersId);
+            next=getNextWorkerInHash(target_hash);
         }
+        this->companies->Union(acq,target);
+        this->companies->Elements[acq]->value+=(factor*this->companies->Elements[target]->value);
+        this->companies->Last_Values[target]=this->companies->Elements[acq]->value;
         /*for(int i=0;i<target_hash->array_size;i++)
         {
             while(target_hash->elements[i]!=nullptr)
