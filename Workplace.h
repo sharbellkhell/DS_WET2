@@ -26,7 +26,10 @@ class Workplace{
         StatusType compValue(int comp_id);
         StatusType promoteAllInRange(int l_sal, int h_sal, int bump_grade);//bonus
         void Quit();
+
 };
+    typedef AVLTree<int,AVLTree<int,Employee*>*> AVLAVL;
+    RankInfo fixRanksAVLAVL(AVLAVL* root);
 
 
 

@@ -172,6 +172,7 @@ int getNumEmployeesOnlyInNode(AVLTree<Key,Value>* node){
     return (rank_node - rank_right - rank_left);
 }
 
+
 template<class Key,class Value>
 AVLTree<Key,Value>* rotateLeft(AVLTree<Key,Value>* A){
     //The following two defs are needed to link nodes with outside tree after rotation
@@ -220,6 +221,7 @@ AVLTree<Key,Value>* rotateLeft(AVLTree<Key,Value>* A){
                        nA.SumGrades);
     A->rank = RankInfo(1 + nAL.NumEmployees + nBL.NumEmployees,
                        AOnlySumGrades + nAL.SumGrades + nBL.SumGrades);
+
     return B;
 }
 
