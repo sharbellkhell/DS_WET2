@@ -3,10 +3,10 @@
 
 struct RankInfo {
     int NumEmployees;
-    int SumGrades;
+    long long SumGrades;
 
-    RankInfo(int NumEmployees = 0,
-            int SumGrades = 0 ) :
+    explicit RankInfo(int NumEmployees = 0,
+                      long long SumGrades = 0 ) :
             NumEmployees(NumEmployees),
             SumGrades(SumGrades) {}
 

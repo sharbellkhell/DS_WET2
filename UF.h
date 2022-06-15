@@ -16,18 +16,18 @@ public:
     double* Last_Values; // Holds the company values the last time they were updated
 
 
-    UF(int size);
+    explicit UF(int size);
     ~UF();
     void InitAllElements();
-    bool isRoot(key Key);
+    key Find(key Key) const;
+    T* Union(key Key1, key Key2) const;
     void MakeSet(int index);
-    key Find(key Key);
-    T* Union(key Key1, key Key2);
-    bool UpdateLastValue(int index, double new_value);
-/*
-private:
-    double aux_find(key Key);
-    */
+
+    /*bool UpdateLastValue(int index, double new_value);
+    //bool isRoot(key Key);
+    private:
+        double aux_find(key Key);
+        */
 };
 
 

@@ -11,11 +11,11 @@
         emp_sals = nullptr;
     }
 
-    Workplace* Workplace::init(int k)
+    /*Workplace* Workplace::init(int k)
     {
         Workplace* workplace = new Workplace(k);
         return workplace;
-    }
+    }*/
 
 
     static AVLTree<int,AVLTree<int,Employee*>*>* insertDuplicateNode(int sal,Employee* emp,
@@ -78,7 +78,7 @@
             return INVALID_INPUT;
         comp_id=this->companies->Find(comp_id);
         Employee* temp = new Employee(emp_id,comp_id,0,grade);
-        if(this->employees->insertToTable(emp_id,temp)==false)
+        if(!(this->employees->insertToTable(emp_id,temp)))
         {
             delete temp;
             return FAILURE;
@@ -119,7 +119,7 @@
         return SUCCESS;
     }
 
-    static void mergeHash(int acq_id ,HashTable* acq,HashTable* target)
+    /*static void mergeHash(int acq_id ,HashTable* acq,HashTable* target)
     {
         for(int i=0;i<target->array_size;i++)
         {
@@ -134,7 +134,7 @@
         target->elements=new AVLTree<int,Employee*>*[1];
         target->elements[0]=nullptr;
         target->array_size=1;
-    }
+    }*/
     static Employee* getNextWorkerInHash(HashTable* hash)
     {
         if(hash->num_elements==0)
@@ -280,7 +280,7 @@
     }
 
 
-    StatusType Workplace::compValue(int comp_id)
+    StatusType Workplace::compValue(int comp_id) const
     {
         if(comp_id <= 0 || comp_id>this->companies->size)
             return INVALID_INPUT;
@@ -336,7 +336,7 @@
     {
         //find first node in range
         bool flag = false;
-        while(sal_tree!=nullptr && flag==false)
+        while(sal_tree!=nullptr && (!flag) )
         {
             if(sal_tree->key<l_sal)
                 sal_tree=sal_tree->right;
@@ -388,9 +388,9 @@
         //return results
         if(worker_count==0)
             return -1;
-        return (double)sum_grades/worker_count;
+        return ((double)(sum_grades)/(double)(worker_count));
     }
-    StatusType Workplace::averageGradeInRange(int comp_id, int l_sal, int h_sal)
+    StatusType Workplace::averageGradeInRange(int comp_id, int l_sal, int h_sal) const
     {
         if(l_sal<0 || h_sal<0|| h_sal<l_sal || comp_id<0 || comp_id>this->companies->size)
             return INVALID_INPUT;
@@ -568,11 +568,10 @@
 
         }
         delete(found);
-        return;
     }
 
 
-    StatusType Workplace::sumGradesBetweenTop(int comp_id, int m)
+    StatusType Workplace::sumGradesBetweenTop(int comp_id, int m) const
     {
         if(m<=0 || comp_id <0 || comp_id>this->companies->size){
             return INVALID_INPUT;

@@ -1,6 +1,6 @@
 #ifndef AVLTREE_H
 #define AVLTREE_H
-#include <assert.h>
+#include <cassert>
 #include "exceptions.h"
 #include "RankInfo.h"
 
@@ -18,8 +18,8 @@ struct AVLTree {
     RankInfo rank;
     int height;
 
-    ~AVLTree(){
-    }
+    ~AVLTree() = default ;
+
     AVLTree(const Key &key,
             const Value &value,
             AVLTree* parent = nullptr)  :
@@ -186,7 +186,7 @@ AVLTree<Key,Value>* rotateLeft(AVLTree<Key,Value>* A){
     , nA  = (A) ? A->rank : RankInfo()
     , nB  = (B) ? B->rank : RankInfo();
 
-    int AOnlySumGrades = nA.SumGrades - nAL.SumGrades - nB.SumGrades;
+    long long AOnlySumGrades = nA.SumGrades - nAL.SumGrades - nB.SumGrades;
     assert(B); // if reached assert, we are performing illegal rotation
     AVLTree<Key,Value>* Bl = B->left;
     B->left = A;
@@ -211,11 +211,11 @@ AVLTree<Key,Value>* rotateLeft(AVLTree<Key,Value>* A){
         }
     }
 
-//    B->rank = RankInfo(getNumEmployeesOnlyInNode(B) + getNumEmployeesOnlyInNode(A)
-//                        + nBR.NumEmployees + nBL.NumEmployees + nAL.NumEmployees,
-//                        nA.SumGrades);
-//    A->rank = RankInfo(getNumEmployeesOnlyInNode(A) + nAL.NumEmployees + nBL.NumEmployees,
-//                       AOnlySumGrades + nAL.SumGrades + nBL.SumGrades);
+    /*B->rank = RankInfo(getNumEmployeesOnlyInNode(B) + getNumEmployeesOnlyInNode(A)
+                        + nBR.NumEmployees + nBL.NumEmployees + nAL.NumEmployees,
+                        nA.SumGrades);
+    A->rank = RankInfo(getNumEmployeesOnlyInNode(A) + nAL.NumEmployees + nBL.NumEmployees,
+                       AOnlySumGrades + nAL.SumGrades + nBL.SumGrades);*/
     B->rank = RankInfo(2
                        + nBR.NumEmployees + nBL.NumEmployees + nAL.NumEmployees,
                        nA.SumGrades);
@@ -238,7 +238,7 @@ AVLTree<Key,Value>* rotateRight(AVLTree<Key,Value>* B){
             , nA  = (A) ? A->rank : RankInfo()
             , nB  = (B) ? B->rank : RankInfo();
 
-    int BOnlySumGrades = nB.SumGrades - nA.SumGrades - nBR.SumGrades;
+    long long BOnlySumGrades = nB.SumGrades - nA.SumGrades - nBR.SumGrades;
 
     assert(A); // if reached assert, we are performing illegal rotation
     AVLTree<Key,Value>* Ar = A->right;
@@ -262,11 +262,11 @@ AVLTree<Key,Value>* rotateRight(AVLTree<Key,Value>* B){
         case root: {break;
         }
     }
-//    A->rank = RankInfo(getNumEmployeesOnlyInNode(A) + getNumEmployeesOnlyInNode(B)
-//                        + nAL.NumEmployees + nAR.NumEmployees + nBR.NumEmployees,
-//                        nB.SumGrades);
-//    B->rank = RankInfo(getNumEmployeesOnlyInNode(B) + nBR.NumEmployees + nAR.NumEmployees,
-//                        BOnlySumGrades + nBR.SumGrades + nAR.SumGrades);
+    /*A->rank = RankInfo(getNumEmployeesOnlyInNode(A) + getNumEmployeesOnlyInNode(B)
+                        + nAL.NumEmployees + nAR.NumEmployees + nBR.NumEmployees,
+                        nB.SumGrades);
+    B->rank = RankInfo(getNumEmployeesOnlyInNode(B) + nBR.NumEmployees + nAR.NumEmployees,
+                        BOnlySumGrades + nBR.SumGrades + nAR.SumGrades);*/
     A->rank = RankInfo(2
                        + nAL.NumEmployees + nAR.NumEmployees + nBR.NumEmployees,
                        nB.SumGrades);
@@ -454,7 +454,7 @@ AVLTree<Key,Value>* removeNode(AVLTree<Key,Value>* root, const Key& key , int gr
     // These nodes will store the node we will swap to_remove with,
     // and it's parent
     AVLTree<Key,Value>* new_parent = to_remove->parent;
-    AVLTree<Key,Value>* swap_with = to_remove;
+    AVLTree<Key,Value>* swap_with;
     AVLTree<Key,Value>* new_root;
     long long only_to_remove_sum_grades = getSumGradesOnlyInNode(to_remove);
     int only_to_remove_num_employees = getNumEmployeesOnlyInNode(to_remove);
@@ -513,11 +513,11 @@ AVLTree<Key,Value>* removeNode(AVLTree<Key,Value>* root, const Key& key , int gr
 /* --------------------------------------------------------------------------------------------------------------------
  *                                                Merge Trees
   --------------------------------------------------------------------------------------------------------------------*/
-
 /*
- * Converts AVL tree to a sorted array
- * Assumes array is allocated
- */
+//
+//  Converts AVL tree to a sorted array
+//  Assumes array is allocated
+// /
 template<class Key, class Value>
 void arrayInOrder(AVLTree<Key,Value>* starting_point, int* index,
                   AVLTree<Key,Value>** arr, int arr_size){
@@ -533,10 +533,10 @@ void arrayInOrder(AVLTree<Key,Value>* starting_point, int* index,
     arrayInOrder(starting_point->right, index, arr, arr_size);
 }
 
-/*
- * Merges two sorted array into one
- * allocates it's own memory for the merged_array
- */
+//
+// Merges two sorted array into one
+// allocates it's own memory for the merged_array
+//
 template<class Key,class Value>
 AVLTree<Key, Value>** mergeTwoSortedArrays(AVLTree<Key, Value>** array_a,
                                            AVLTree<Key, Value>** array_b,
@@ -572,10 +572,10 @@ AVLTree<Key, Value>** mergeTwoSortedArrays(AVLTree<Key, Value>** array_a,
     return merged_array;
 }
 
-/*
- * Converts a sorted array to an AVL tree
- * Allocates it's own memory for the tree
- */
+//
+//  Converts a sorted array to an AVL tree
+//  Allocates it's own memory for the tree
+// /
 template<class Key, class Value>
 AVLTree<Key, Value>* convertArrayToAVL(AVLTree<Key, Value>** arr,
                                        int start_point,
@@ -622,7 +622,7 @@ AVLTree<Key,Value>* mergeTrees(AVLTree<Key,Value>* tree_a, AVLTree<Key,Value>* t
     delete [] merged_array;
     return result_AVL;
 }
-
+*/
 
 /* --------------------------------------------------------------------------------------------------------------------
  *                                                Quit.

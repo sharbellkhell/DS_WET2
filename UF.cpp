@@ -15,16 +15,18 @@ UF::UF(int size):
         }
 }
 
+/*
 bool UF::isRoot(key Key){
     return (Parents[Key] == Key);
 
-}
+}*/
 
 void UF::MakeSet(int i){
     if ( i <= 0 || i > size+1){
         return;
     }
     Elements[current] = new Company(i,i);
+    Elements[current]->companyId = i;
     Parents[current] = current; // Root is parent of itself
     Sizes[current] = 1;
     Last_Values[current]=0;
@@ -53,21 +55,21 @@ double UF::aux_find(key Key)
     return Elements[Key]->value;
 }
 */
-key UF::Find(key Key){
+key UF::Find(key Key) const{
     if(Parents[Key]==Key)
         return Key;
     key root=Key;
     key before_root;
     while(Parents[root]!=root)
     {
-        if(Parents[root]=Parents[Parents[root]])
+        if(Parents[root]==Parents[Parents[root]])
             before_root=root;
         root=Parents[root];
     }
    // double result=aux_find(Key);
     key iterator=Key;
 
-    key temp=0;
+    key temp;
     double diff=Elements[root]->value-Last_Values[before_root];
     while(Parents[iterator]!=iterator)
         {
@@ -80,7 +82,7 @@ key UF::Find(key Key){
     return root;
 }
 
-T* UF::Union(key Key1, key Key2){
+T* UF::Union(key Key1, key Key2) const{
     key Root1 = Key1, Root2 = Key2;
     while(Root1!=Parents[Root1])
         Root1=Parents[Root1];
@@ -103,14 +105,14 @@ T* UF::Union(key Key1, key Key2){
     return Elements[absolute_root];
 }
 
-bool UF::UpdateLastValue(int index, double new_value){
+/*bool UF::UpdateLastValue(int index, double new_value){
     if(index > size || index < 0){
         return false;
     }
     double last_value = Last_Values[index];
     Last_Values[index] = new_value;
     return (last_value == new_value);
-}
+}*/
 
 UF::~UF() {
     for(int i = 0; i < size + 1; i++){ //TODO from zero or one?

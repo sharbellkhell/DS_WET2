@@ -29,7 +29,7 @@ struct HashTable{
             delete[] elements;
         }
 
-        int hashIndex(int id)
+        int hashIndex(int id) const
         {
             double x=alpha*id-floor(alpha*id);
             return floor(x*array_size);
@@ -69,9 +69,9 @@ struct HashTable{
         void checkIfRehashNeeded()
         {
             if(num_elements>=array_size*MAX_RATIO)
-                rehash(array_size*INCREASE_SIZE);
+                rehash((int)(array_size*INCREASE_SIZE));
             else if(num_elements<array_size*MIN_RATIO)
-                rehash(array_size*DECREASE_SIZE);
+                rehash((int)(array_size*DECREASE_SIZE));
         }
 
         void rehash(int size)
@@ -112,7 +112,7 @@ struct HashTable{
             return true;
         }
 
-        AVLTree<int,Employee*>* find(int id)
+        AVLTree<int,Employee*>* find(int id) const
         {
             int index=hashIndex(id);
             if(elements[index]==nullptr)

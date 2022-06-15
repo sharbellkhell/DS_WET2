@@ -25,11 +25,9 @@ class Company{
         AVLTree<int,AVLTree<int,Employee*>*>* workersSal;
         Company(int company_id,int value);
         ~Company();
-        StatusType AddEmployee(Employee* emp);
-        StatusType RemoveEmployeeByID(const int employee_id);
-        void CompanyInfo(int* value,int* num_of_employee);
-        void setValue(const int value);
-        void PrintEmployees()const;
+//        StatusType AddEmployee(Employee* emp);
+//        StatusType RemoveEmployeeByID(int employee_id);
+
 };
 
 #endif
