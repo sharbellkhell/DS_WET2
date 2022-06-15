@@ -1,6 +1,63 @@
 #include "library2.h"
+#include "library2.cpp"
+int count(AVLTree<int,Employee*>* root)
+{
+    if(root==nullptr)
+        return 0;
+    return root->value->grade+count(root->left)+count(root->right);
+}
+int countEmps(AVLTree<int,Employee*>* root)
+{
+    if(root==nullptr)
+        return 0;
+    return 1+countEmps(root->left)+countEmps(root->right);
+}
+bool check(AVLTree<int,Employee*>* root,int target)
+{
+    int ccount=count(root);
+    return ccount==target;
+}
+void findAll(AVLTree<int,AVLTree<int,Employee*>*>* root, int h,int l,int* n,int* g)
+{
+    if(root==nullptr)
+        return;
+    if(root->key<=h && root->key>=l)
+    {
+        std::cout<<root->value->rank.NumEmployees<<" emps and "<<root->value->rank.SumGrades<<" grades in "<<root->key<<"\n";
+        *g+=root->value->rank.SumGrades;
+        *n+=root->value->rank.NumEmployees;
+    }
+    findAll(root->right,h,l,n,g);
+    findAll(root->left,h,l,n,g);
+
+}
+int getNum(AVLTree<int,AVLTree<int,Employee*>*>* root)
+{
+    if(root==nullptr)
+        return 0;
+    return root->rank.NumEmployees;
+}
+int getG(AVLTree<int,AVLTree<int,Employee*>*>* root)
+{
+    if(root==nullptr)
+        return 0;
+    return root->rank.SumGrades;
+}
+bool checkall(AVLTree<int,AVLTree<int,Employee*>*>* root)
+{
+    if(root==nullptr)
+        return true;
+    if(root->rank.NumEmployees-countEmps(root->value)==getNum(root->left)+getNum(root->right))
+    {
+        if(root->rank.SumGrades-count(root->value)==getG(root->left)+getG(root->right))
+            return true;
+        return false;
+    }
+    return false;
+}
 int main() {
  void* ds = Init(100);
+ Workplace* work= ((Workplace*)ds);
  AddEmployee(ds,2,23,8);
  AddEmployee(ds,3,57,3);
  AddEmployee(ds,4,39,0);
@@ -900,7 +957,15 @@ int main() {
  EmployeeSalaryIncrease(ds,146,522);
  EmployeeSalaryIncrease(ds,171,834);
  AddEmployee(ds,552,83,0);
+ int n=0;
+ int g=0;
+ findAll(work->emp_sals,100000,0,&n,&g);
+ std::cout<<"total :"<<n<<" emps and "<<g<<" grades";
  EmployeeSalaryIncrease(ds,93,394);
+ n=0;
+ g=0;
+ findAll(work->emp_sals,100000,0,&n,&g);
+ std::cout<<"total :"<<n<<" emps and "<<g<<" grades";
  AddEmployee(ds,553,98,4);
  AddEmployee(ds,554,57,4);
  EmployeeSalaryIncrease(ds,498,318);
@@ -1094,6 +1159,10 @@ int main() {
  EmployeeSalaryIncrease(ds,275,221);
  EmployeeSalaryIncrease(ds,583,277);
  PromoteEmployee(ds,121,-16);
+ n=0;
+ g=0;
+ findAll(work->emp_sals,100000,0,&n,&g);
+ std::cout<<"total :"<<n<<" emps and "<<g<<" grades";
  AverageBumpGradeBetweenSalaryByGroup(ds,0,535,629);
  PromoteEmployee(ds,485,154);
  EmployeeSalaryIncrease(ds,242,427);
